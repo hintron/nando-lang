@@ -1,1 +1,28 @@
 # program2.nando
+# Convert binary 1100 to decimal
+# r0-r3 contain LSb to MSb
+
+set r0 0
+set r1 0
+set r2 1
+set r3 1
+set r4 0
+set r5 1
+
+set r6 r5
+mul r6 r0
+add r4 r6
+mul r5 2
+set r6 r5
+mul r6 r1
+add r4 r6
+mul r5 2
+set r6 r5
+mul r6 r2
+add r4 r6
+mul r5 2
+set r6 r5
+mul r6 r3
+add r4 r6
+mul r5 2
+
