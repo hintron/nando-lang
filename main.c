@@ -39,6 +39,12 @@ int main(int argc, char const *argv[]) {
                 int second_num = 0;
 
                 CommandT cmd = NONE;
+                if (line[0] == '\n') {
+                        continue;
+                }
+                if (line[0] == '\r') {
+                        continue;
+                }
                 if (line[0] == '#') {
                         continue;
                 }
