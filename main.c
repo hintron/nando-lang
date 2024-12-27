@@ -30,7 +30,7 @@ int main(int argc, char const *argv[]) {
         float register_file[REGISTER_FILE_SIZE] = {};
 
         while ((read = getline(&line, &len, file)) != -1) {
-                printf("Line (%zu): %s", len, line);
+                // printf("Line (%zu): %s", len, line);
                 // nando lang is guaranteed to have two values
                 int first_val_pos = -1;
                 int second_val_pos = -1;
@@ -125,7 +125,6 @@ int main(int argc, char const *argv[]) {
                         second_reg = line[second_val_pos + 1] - '0';
                 } else {
                         // Assume this is a float number
-                        printf("second_val_pos: %d\n", second_val_pos);
                         char *end_ptr;
                         second_num = strtof(&line[second_val_pos], &end_ptr);
 
@@ -138,7 +137,6 @@ int main(int argc, char const *argv[]) {
                 // Execute the command!
                 switch (cmd) {
                         case SET:
-                                printf("Executing SET\n");
                                 if (second_reg == -1) {
                                         register_file[first_reg] = second_num;
                                 } else {
@@ -146,7 +144,6 @@ int main(int argc, char const *argv[]) {
                                 }
                                 break;
                         case ADD:
-                                printf("Executing ADD\n");
                                 if (second_reg == -1) {
                                         register_file[first_reg] += second_num;
                                 } else {
@@ -154,7 +151,6 @@ int main(int argc, char const *argv[]) {
                                 }
                                 break;
                         case SUB:
-                                printf("Executing SUB\n");
                                 if (second_reg == -1) {
                                         register_file[first_reg] -= second_num;
                                 } else {
@@ -162,7 +158,6 @@ int main(int argc, char const *argv[]) {
                                 }
                                 break;
                         case MUL:
-                                printf("Executing MUL\n");
                                 if (second_reg == -1) {
                                         register_file[first_reg] *= second_num;
                                 } else {
@@ -170,7 +165,6 @@ int main(int argc, char const *argv[]) {
                                 }
                                 break;
                         case DIV:
-                                printf("Executing DIV\n");
                                 if (second_reg == -1) {
                                         register_file[first_reg] /= second_num;
                                 } else {
