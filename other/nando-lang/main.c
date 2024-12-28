@@ -99,6 +99,7 @@ int main(int argc, char const *argv[]) {
                                         continue;
                                 }
                                 first_val_pos = i;
+                                break;
                         }
                 }
                 if (first_val_pos == -1) {
@@ -120,6 +121,7 @@ int main(int argc, char const *argv[]) {
                                         continue;
                                 }
                                 second_val_pos = i;
+                                break;
                         }
                 }
                 if (second_val_pos == -1) {
