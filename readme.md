@@ -1,7 +1,7 @@
 # Nando Lang
 
 Nando Lang is a simple language and interpreter specification for educational
-purposed. I devised it on a piece of paper to help a web dev friend learn more
+purposes. I devised it on a piece of paper to help a web dev friend learn more
 about compiled languages and how programs written in higher-level languages
 actually run on a CPU.
 
@@ -83,7 +83,11 @@ To run, do:
 # Unicode to UTF-8
 
 See https://en.wikipedia.org/wiki/UTF-8#Description for how to convert code
-point to UTF-8 bytes.
+points to UTF-8 bytes.
 
 See https://www.cogsci.ed.ac.uk/~richard/utf-8.cgi for a tool to convert
-unicode code point to UTF-8.
+unicode code points to UTF-8 bytes.
+
+Alternatively, if you have the UTF-8 character, you can copy and paste it into
+a hex view of a file, and paste it as hex bytes to see the underlying
+representation.
