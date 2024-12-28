@@ -1,10 +1,3 @@
-Unicode code point: 1f600
-
-
-UTF-8: 😀
-
-
-
 See https://en.wikipedia.org/wiki/UTF-8#Description for how to convert code
 point to UTF-8 bytes.
 
