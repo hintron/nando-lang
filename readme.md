@@ -1,6 +1,6 @@
 # Nando Lang
 
-This repo contains a set of beginning excercises and tasks to help you learn the
+This repo contains a set of beginning exercises and tasks to help you learn the
 C programming language and basic CPU architecture.
 
 Exercises:
