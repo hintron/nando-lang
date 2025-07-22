@@ -64,6 +64,10 @@ Exercises to create:
   then interpolated. Take an image we already worked on and insert part of that
   into the triangle somehow. Teaches bit manipulation, arrays, file IO, graphics.
 
+* Out of this world: Create a mini orbiting solar system using the gravitational
+  equation and planet sprites. Spawn planets with a simple click in a given
+  direction. Teaches math, simulation, mouse input handling, event loops.
+
 * De Morgan's Lawyer: Reduce some boolean logic in C code to it's most optimal
   form using De Morgan's law and other boolean identities.
 
