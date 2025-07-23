@@ -52,9 +52,14 @@ Exercises to create:
   chars and to print a string. Teaches arrays, strings, memory, pointers, data
   types.
 
+* Histogram: Process a text file and print a histogram of how many times each
+  letter is used. Print to screen.
+
 * Treasure hunt: Follow a set of instructions to bit manipulate some garbled
   data and extract a secret message. This will teach bitwise operations,
   masking, data types, casting, etc.
+
+* Mini REPL: Make a mini repl/shell with some simple commands.
 
 * Image-in that!: Extract an image from garbled data and piece it together,
   like a jigsaw puzzle. Teaches bit manipulation, arrays, file IO.
