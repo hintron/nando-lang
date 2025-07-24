@@ -42,6 +42,17 @@ Exercises to create:
 
 * My first divide by 0: Write a program that divides by 0.
 
+* Numbers do *what*?: Write a program that takes two small signed numbers, cast
+  them to unsigned, add them together, print the results, then cast them back to
+  signed. Also, print the hex at each stage. Show that unsigned and signed
+  integer arithmetic is the same, because of two's complement. Under the hood,
+  the CPU has integer add/sub instructions that don't care about the sign.
+  Also, do multiplication, but notice that the difference is in sign extension
+  of the upper bits
+  Resources:
+  * https://stackoverflow.com/questions/42587607/why-is-imul-used-for-multiplying-unsigned-numbers
+  * https://www.computerenhance.com/p/q-and-a-22-2023-08-15?utm_campaign=post&utm_medium=web&timestamp=394
+
 * My first floating point inaccuracies: Write a program that accumulates
   floating point inaccuracies. Also, do the same thing in Python and Javascript,
   and point out that everything uses IEEE floating point under the hood. Maybe
