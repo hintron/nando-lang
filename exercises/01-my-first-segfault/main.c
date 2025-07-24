@@ -5,7 +5,7 @@
 ////////////////////////////////////////////////////////
 #include <stdio.h>
 
-int WinMain() {
+int main() {
     int x = 1337; // Value of x
     int *p = &x; // Pointer to x
     printf("x addr: %p\n", p);

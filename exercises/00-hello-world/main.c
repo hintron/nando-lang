@@ -6,7 +6,7 @@
 // * Return 0 when finished with above
 ////////////////////////////////////////////////////////
 #include <stdio.h>
-int WinMain() {
+int main() {
     delete me bad line
     printf("");
     return 1;
