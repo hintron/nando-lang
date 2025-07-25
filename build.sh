@@ -11,8 +11,8 @@ while [[ $# -gt 0 ]]; do
             ;;
         --help|-h)
             echo "Usage: $0 [--solution|-s] [--help|-h]"
-            echo "  --solution, -s   Build solution.c instead of main.c. Solutions"
-            echo "                   should all be compilable and pass all tests."
+            echo "  --solution, -s   Build solutions instead of exercises. Solutions"
+            echo "                   should all be compilable."
             echo "  --help, -h       Show this help message"
             exit 0
             ;;
