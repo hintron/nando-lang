@@ -11,7 +11,7 @@ expected_return_codes["00-hello-world"]=0
 expected_return_codes["01-my-first-segfault"]=139
 
 # Run each exercise
-for dir in */; do
+for dir in "$SCRIPT_DIR/exercises"/*/; do
     if [ ! -d "$dir" ]; then
         continue
     fi

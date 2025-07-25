@@ -3,7 +3,7 @@
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
 failed="false"
-for dir in "$SCRIPT_DIR"/*/; do
+for dir in "$SCRIPT_DIR/exercises"/*/; do
     dir=${dir%/}
     if [ ! -f "$dir/main.c" ]; then
         continue
