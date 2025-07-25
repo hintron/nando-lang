@@ -27,7 +27,7 @@ for dir in "$SCRIPT_DIR/exercises"/*/; do
         exit 1
     fi
     echo "Running $dir_key/main.bin"
-    cd "$dir"
+    cd "$dir" || exit
 
     if [ ! -f "main.bin" ]; then
         echo "Error: main.bin not found in $dir. Please run build.sh first."
