@@ -11,9 +11,3 @@ int main() {
     printf("");
     return 1;
 }
-
-// // Solution:
-// int WinMain() {
-//     printf("Hello, world!");
-//     return 0;
-// }
