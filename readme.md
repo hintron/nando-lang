@@ -22,6 +22,10 @@ Inside the directory, run `init.sh` once in a terminal and follow the instructio
 
 # TODO:
 
+Make a top-level executable script. Run it first without arguments to initialize
+things. Then, subsequent runs will build and run the exercises. Merge init.sh,
+clean.sh, build.sh, and run.sh into that single executable.
+
 Create some exercises that will help teach C in a fun way. Support it for MacOS,
 Linux (Ubuntu), and WSL (Ubuntu). Have each exercise have a readme page with
 explanations, hints, and external resources. Each exercise will also have
