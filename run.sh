@@ -40,9 +40,15 @@ for dir in "$SCRIPT_DIR/exercises"/*/; do
 
     dir_key=${dir%/}
 
+    PASSED_FILE="$dir/.passed-$BUILD_TARGET"
+    if [ -f "$PASSED_FILE" ]; then
+        echo "* Exercise $dir_key: Already passed! (run clean.sh --clear to reset progress)"
+        continue
+    fi
+
+    echo "* Exercise $dir_key"
     echo "*********************************************************************"
-    echo "Exercise $dir_key"
-    echo "*********************************************************************"
+
     BUILD_FILE_FULL="$dir_key/$BUILD_FILE"
     BUILD_OUTPUT_FULL="$dir_key/$BUILD_OUTPUT"
     echo "Building $BUILD_FILE_FULL"
@@ -70,7 +76,6 @@ for dir in "$SCRIPT_DIR/exercises"/*/; do
     echo "---"
     echo "Return Code: $return_code"
 
-
     # Check expected output if defined
     if [[ -n "${expected_outputs[$dir_key]}" ]]; then
         if [[ "$output" != *"${expected_outputs[$dir_key]}"* ]]; then
@@ -88,6 +93,7 @@ for dir in "$SCRIPT_DIR/exercises"/*/; do
     fi
 
     echo "Exercise completed!"
+    touch "$PASSED_FILE"  # Mark as passed
     cd ..
 done
 
