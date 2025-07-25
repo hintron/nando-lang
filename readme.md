@@ -3,7 +3,18 @@
 This repo contains a set of beginning exercises and tasks to help you learn the
 C programming language and basic CPU architecture.
 
-Exercises:
+
+# Quickstart
+
+Go to https://github.com/hintron/nando-lang/releases and download the source
+code and extract it to a directory (don't use Git to clone it).
+
+Inside the directory, run `init.sh` once in a terminal and follow the instructions!
+
+(You may do `git init` after that, if you use Git to save your work.)
+
+
+# Exercises:
 
 * [Nando Lang](exercises/nando-lang/readme.md) Build a very, very simple language
   interpreter (The original task that this repo is named after).
