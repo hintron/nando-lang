@@ -2,5 +2,5 @@
 
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
-echo "Deleting all main.bin files"
-find "$SCRIPT_DIR/exercises" -name "main.bin" -type f -delete
+echo "Deleting all .bin files"
+find "$SCRIPT_DIR/exercises" -name "*.bin" -type f -delete
