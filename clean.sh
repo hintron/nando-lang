@@ -29,6 +29,4 @@ find "$SCRIPT_DIR/exercises" -name "*.bin" -type f -delete
 if [ "$DELETE_SOLUTIONS" = "true" ]; then
     echo "Deleting all solution files"
     find "$SCRIPT_DIR/exercises" -name "solution.c" -type f -delete
-else
-    echo "Skipping deletion of solution files"
 fi
