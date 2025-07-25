@@ -1,6 +1,4 @@
-# My First Segfault
-
-## Task
+# Task
 
 Write a C program in `segfault.c` that will dereference (`*`) a null pointer.
 

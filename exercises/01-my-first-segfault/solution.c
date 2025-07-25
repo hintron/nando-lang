@@ -17,7 +17,10 @@ int main() {
     printf("x val: %d\n", *p);
     fflush(stdout); // Force printf to write before segfault occurs
 
-    // TODO: Insert your code here
-
+    // Solution:
+    p = 0;
+    p = (int *)0xFFFFFFF;
+    printf("x addr: %p\n", p);
+    printf("x val: %d\n", *p);
     return 1;
 }
