@@ -106,7 +106,7 @@ else
         fi
         PASSED_FILE="$dir/.passed-$BUILD_TARGET"
         if [ -f "$PASSED_FILE" ]; then
-            echo "* Exercise $dir_key: Already passed! (run \`./run.sh${DEV_FLAG} --reset\` to rerun)"
+            echo "✅ Exercise $dir_key: Already passed! (run \`./run.sh${DEV_FLAG} --reset\` to rerun)"
             continue
         fi
 
@@ -116,7 +116,7 @@ else
 
         BUILD_FILE_FULL="$dir_key/$BUILD_FILE"
         EXECUTABLE_FULL="$dir_key/$BUILD_OUTPUT"
-        echo "Build command:"
+        echo "Build command 🏗️"
         echo "    gcc $BUILD_FILE_FULL -o $EXECUTABLE_FULL"
         if ! gcc "$BUILD_FILE_FULL" -o "$EXECUTABLE_FULL"; then
             echo "Error: Failed to build. Please fix build failures and complete the task."
@@ -128,7 +128,7 @@ else
             echo "Error: $EXECUTABLE_FULL not found in $dir; cannot run exercise."
             exit 1
         fi
-        echo "Run command:"
+        echo "Run command ⏩"
         echo "    $EXECUTABLE_FULL"
 
         echo "Output:"
@@ -159,7 +159,7 @@ else
             fi
         fi
 
-        echo "Exercise passed!"
+        echo "✅ Exercise passed!"
         touch "$PASSED_FILE"  # Mark as passed
         cd ..
     done
