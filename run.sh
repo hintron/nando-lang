@@ -3,7 +3,7 @@
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
 BUILD_TARGET="main"
-SKIP_INIT="false"
+IS_DEV="false"
 CLEAN="false"
 RESET="false"
 while [[ $# -gt 0 ]]; do
@@ -31,7 +31,7 @@ while [[ $# -gt 0 ]]; do
     # solutions instead of exercises. For solution development.
     --dev)
         BUILD_TARGET="solution"
-        SKIP_INIT="true"
+        IS_DEV="true"
         shift
         ;;
     *)
@@ -46,7 +46,7 @@ if [ "$CLEAN" = "true" ]; then
     find "$SCRIPT_DIR/exercises" -name "*.bin" -type f -delete
     # Delete all solution files
     find "$SCRIPT_DIR/exercises" -name "solution.c" -type f -delete
-elif [ "$SKIP_INIT" = "false" ] && [ -f "$SCRIPT_DIR/exercises/00-hello-world/solution.c" ]; then
+elif [ "$IS_DEV" = "false" ] && [ -f "$SCRIPT_DIR/exercises/00-hello-world/solution.c" ]; then
     echo "Initializing exercises..."
     # Deleting all .bin files
     find "$SCRIPT_DIR/exercises" -name "*.bin" -type f -delete
@@ -99,9 +99,14 @@ else
 
         dir_key=${dir%/}
 
+        if [ "$IS_DEV" = "true" ]; then
+            DEV_FLAG=" --dev"
+        else
+            DEV_FLAG=""
+        fi
         PASSED_FILE="$dir/.passed-$BUILD_TARGET"
         if [ -f "$PASSED_FILE" ]; then
-            echo "* Exercise $dir_key: Already passed! (run run.sh --reset to reset progress)"
+            echo "* Exercise $dir_key: Already passed! (run \`./run.sh${DEV_FLAG} --reset\` to rerun)"
             continue
         fi
 
