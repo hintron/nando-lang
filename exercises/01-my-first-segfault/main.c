@@ -2,8 +2,7 @@
 // My First Segfault
 ////////////////////////////////////////////////////////////////////////////////
 // Task:
-// * Set p to 0, print the address, and then print the value (dereference it).
-// * You may need to add `(int *)` to the left of the value to cast it.
+// * Something is wrong with y_ptr. Fix it so that it points to y instead of NULL.
 // 
 // See https://github.com/hintron/nando-lang/blob/main/exercises/01-my-first-segfault/background.md
 // for more information on segfaults.
@@ -12,12 +11,18 @@
 
 int main() {
     int x = 1337; // Value of x
-    int *p = &x; // Pointer to x
-    printf("x addr: %p\n", p);
-    printf("x val: %d\n", *p);
+    int *x_ptr = &x; // Pointer to x
+    printf("x addr: %p\n", x_ptr);
+    printf("x val: %d\n", *x_ptr);
     fflush(stdout); // Force printf to write before segfault occurs
 
-    // TODO: Insert your code here
+    int y = *x_ptr + 2000; // Value of y (what do you think it will be?)
+    int *y_ptr = 0; // Pointer to y (initialized to NULL or 0)
 
-    return 1;
+    // TODO: Fix y_ptr here!
+
+    printf("y addr: %p\n", y_ptr);
+    printf("y val: %d\n", *y_ptr);
+
+    return 0;
 }

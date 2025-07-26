@@ -85,11 +85,11 @@ else
     declare -A expected_outputs
 
     # Use arrays for each key to hold multiple expected outputs
-    expected_outputs["00-hello-world[0]"]="Hello, world!"
-    expected_outputs["01-my-first-segfault[0]"]="x addr: 0x"
-    expected_outputs["01-my-first-segfault[1]"]="x val: 1337"
-    expected_outputs["01-my-first-segfault[2]"]="y addr: 0x"
-    expected_outputs["01-my-first-segfault[3]"]="y val: 3773"
+    expected_outputs["00-hello-world-0"]="Hello, world!"
+    expected_outputs["01-my-first-segfault-0"]="x addr: 0x"
+    expected_outputs["01-my-first-segfault-1"]="x val: 1337"
+    expected_outputs["01-my-first-segfault-2"]="y addr: 0x"
+    expected_outputs["01-my-first-segfault-3"]="y val: 3337"
 
     # Run each exercise
     BUILD_FILE="$BUILD_TARGET.c"
@@ -99,7 +99,8 @@ else
             continue
         fi
 
-        dir_key=${dir%/}
+        dir=${dir%/}  # Remove trailing slash
+        dir_key="$(basename "$dir")"
 
         if [ "$IS_DEV" = "true" ]; then
             DEV_FLAG=" --dev"
@@ -116,8 +117,8 @@ else
         echo "* Exercise $dir_key"
         echo "*********************************************************************"
 
-        BUILD_FILE_FULL="$dir_key/$BUILD_FILE"
-        EXECUTABLE_FULL="$dir_key/$BUILD_OUTPUT"
+        BUILD_FILE_FULL="$dir/$BUILD_FILE"
+        EXECUTABLE_FULL="$dir/$BUILD_OUTPUT"
         echo "Build command 🏗️"
         echo "    gcc $BUILD_FILE_FULL -o $EXECUTABLE_FULL"
         if ! gcc "$BUILD_FILE_FULL" -o "$EXECUTABLE_FULL"; then
@@ -153,7 +154,8 @@ else
         # Iterate through all expected outputs for this key
         idx=0
         while true; do
-            val="${expected_outputs["$dir_key[$idx]"]}"
+            key="$dir_key-$idx"
+            val="${expected_outputs["$key"]}"
             if [ -z "$val" ]; then
                 break
             fi
