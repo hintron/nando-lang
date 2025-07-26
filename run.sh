@@ -143,7 +143,7 @@ else
         echo "Run command ⏩"
         echo "    $EXECUTABLE_FULL"
 
-        echo "Output:"
+        echo "Program output:"
         echo ""
         # Capture output and return code
         output=$("$EXECUTABLE_FULL" 2>&1)
@@ -159,6 +159,8 @@ else
             exit 1
         fi
 
+        expected_output=""
+        rc=0
         # Parse expected outputs into a map for easier lookup
         for entry in "${expected_outputs[@]}"; do
             key="${entry%%:*}"
@@ -168,11 +170,21 @@ else
                 continue
             fi
 
+            expected_output+="${val}"$'\n'
             if ! echo "$output" | grep -Fq -- "$val"; then
-                echo "❌ Failure: '$val' not found in output"
-                exit 1
+                rc=1
             fi
         done
+
+        if [ "$rc" -ne 0 ]; then
+            echo "❌ Failure: Expected output did not match program output"
+            echo "The expected output must contain lines that start with these phrases (case sensitive):"
+            echo ""
+            echo "$expected_output"
+            echo ""
+            exit 1
+        fi
+        rc=1
 
         echo "✅ Exercise passed!"
         touch "$PASSED_FILE"  # Mark as passed
