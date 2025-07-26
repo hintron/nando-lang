@@ -9,6 +9,13 @@ expected_outputs=(
     "01-my-first-segfault:y val: 3337"
 )
 
+# Set compiler based on the operating system
+if [[ "$(uname)" == "Darwin" ]]; then
+    CC="clang"
+else
+    CC="gcc"
+fi
+
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
 BUILD_TARGET="main"
@@ -120,8 +127,8 @@ else
         BUILD_FILE_FULL="$dir/$BUILD_FILE"
         EXECUTABLE_FULL="$dir/$BUILD_OUTPUT"
         echo "Build command 🏗️"
-        echo "    gcc $BUILD_FILE_FULL -o $EXECUTABLE_FULL"
-        if ! gcc "$BUILD_FILE_FULL" -o "$EXECUTABLE_FULL"; then
+        echo "    $CC $BUILD_FILE_FULL -o $EXECUTABLE_FULL"
+        if ! $CC "$BUILD_FILE_FULL" -o "$EXECUTABLE_FULL"; then
             echo "❌ Error: Failed to build. Please fix build failures and complete the task."
             exit 1
         fi
