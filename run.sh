@@ -70,6 +70,8 @@ elif [ "$IS_DEV" = "false" ] && [ -f "$SCRIPT_DIR/exercises/00-hello-world/solut
     find "$SCRIPT_DIR/exercises" -name "solution.c" -type f -delete
     # Making a copy of every main.c as original.c
     find "$SCRIPT_DIR/exercises" -name "main.c" -type f -exec sh -c 'cp "$1" "$(dirname "$1")/original.c"' _ {} \;
+    # Delete other files
+    rm -rf "$SCRIPT_DIR/other"
 
     # Now, print out instructions for how to run the exercises
     echo "Welcome to nando-lang C exercises!"
