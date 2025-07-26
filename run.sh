@@ -105,17 +105,19 @@ else
             continue
         fi
 
+        echo "*********************************************************************"
         echo "* Exercise $dir_key"
         echo "*********************************************************************"
 
         BUILD_FILE_FULL="$dir_key/$BUILD_FILE"
         BUILD_OUTPUT_FULL="$dir_key/$BUILD_OUTPUT"
-        echo "Building $BUILD_FILE_FULL"
+        echo "Build command:"
+        echo "    gcc $BUILD_FILE_FULL -o $BUILD_OUTPUT_FULL"
         if ! gcc "$BUILD_FILE_FULL" -o "$BUILD_OUTPUT_FULL"; then
             echo "Error: Failed to build. Please fix build failures and complete the task."
             exit 1
         fi
-        echo "Running $BUILD_OUTPUT_FULL"
+        echo "Running exercise..."
         cd "$dir" || exit
 
         if [ ! -f "$BUILD_OUTPUT_FULL" ]; then
@@ -151,7 +153,7 @@ else
             fi
         fi
 
-        echo "Exercise completed!"
+        echo "Exercise passed!"
         touch "$PASSED_FILE"  # Mark as passed
         cd ..
     done
