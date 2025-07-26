@@ -115,26 +115,27 @@ else
         echo "*********************************************************************"
 
         BUILD_FILE_FULL="$dir_key/$BUILD_FILE"
-        BUILD_OUTPUT_FULL="$dir_key/$BUILD_OUTPUT"
+        EXECUTABLE_FULL="$dir_key/$BUILD_OUTPUT"
         echo "Build command:"
-        echo "    gcc $BUILD_FILE_FULL -o $BUILD_OUTPUT_FULL"
-        if ! gcc "$BUILD_FILE_FULL" -o "$BUILD_OUTPUT_FULL"; then
+        echo "    gcc $BUILD_FILE_FULL -o $EXECUTABLE_FULL"
+        if ! gcc "$BUILD_FILE_FULL" -o "$EXECUTABLE_FULL"; then
             echo "Error: Failed to build. Please fix build failures and complete the task."
             exit 1
         fi
-        echo "Running exercise..."
         cd "$dir" || exit
 
-        if [ ! -f "$BUILD_OUTPUT_FULL" ]; then
-            echo "Error: $BUILD_OUTPUT_FULL not found in $dir; cannot run exercise."
+        if [ ! -f "$EXECUTABLE_FULL" ]; then
+            echo "Error: $EXECUTABLE_FULL not found in $dir; cannot run exercise."
             exit 1
         fi
+        echo "Run command:"
+        echo "    $EXECUTABLE_FULL"
 
         echo "Output:"
         echo "---"
         # Capture output and return code
         # output=$(./main.bin 2>&1 | tee /tmp/exercise_output.tmp)
-        output=$("$BUILD_OUTPUT_FULL" 2>&1)
+        output=$("$EXECUTABLE_FULL" 2>&1)
         return_code=$?
         echo "$output"
         # output=$(cat /tmp/exercise_output.tmp)
@@ -163,6 +164,8 @@ else
         cd ..
     done
 
-    echo "========================================================================="
-    echo "All exercises completed successfully!"
+    echo "🎇🎆🎉🎊🎇🎆🎉🎊🎇🎆🎉🎊🎇🎆🎉🎊🎇🎆🎉🎊🎇🎆🎉🎊🎇🎆🎉🎊🎇🎆🎉🎊"
+    echo "Congratulations! 🎉 All exercises have passed."
+    echo "Thank you for solving nando-lang! I hope you learned C better."
+    echo "Please leave a star on the GitHub repository if you enjoyed it!"
 fi
