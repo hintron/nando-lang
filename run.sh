@@ -83,11 +83,13 @@ else
     fi
 
     declare -A expected_outputs
-    declare -A expected_return_codes
 
-    expected_outputs["00-hello-world"]="Hello, world!"
-    expected_return_codes["00-hello-world"]=0
-    expected_return_codes["01-my-first-segfault"]=139
+    # Use arrays for each key to hold multiple expected outputs
+    expected_outputs["00-hello-world[0]"]="Hello, world!"
+    expected_outputs["01-my-first-segfault[0]"]="x addr: 0x"
+    expected_outputs["01-my-first-segfault[1]"]="x val: 1337"
+    expected_outputs["01-my-first-segfault[2]"]="y addr: 0x"
+    expected_outputs["01-my-first-segfault[3]"]="y val: 3773"
 
     # Run each exercise
     BUILD_FILE="$BUILD_TARGET.c"
@@ -119,45 +121,48 @@ else
         echo "Build command 🏗️"
         echo "    gcc $BUILD_FILE_FULL -o $EXECUTABLE_FULL"
         if ! gcc "$BUILD_FILE_FULL" -o "$EXECUTABLE_FULL"; then
-            echo "Error: Failed to build. Please fix build failures and complete the task."
+            echo "❌ Error: Failed to build. Please fix build failures and complete the task."
             exit 1
         fi
         cd "$dir" || exit
 
         if [ ! -f "$EXECUTABLE_FULL" ]; then
-            echo "Error: $EXECUTABLE_FULL not found in $dir; cannot run exercise."
+            echo "‼️ Error: $EXECUTABLE_FULL not found in $dir; cannot run exercise."
             exit 1
         fi
         echo "Run command ⏩"
         echo "    $EXECUTABLE_FULL"
 
         echo "Output:"
-        echo "---"
+        echo ""
         # Capture output and return code
-        # output=$(./main.bin 2>&1 | tee /tmp/exercise_output.tmp)
         output=$("$EXECUTABLE_FULL" 2>&1)
         return_code=$?
         echo "$output"
-        # output=$(cat /tmp/exercise_output.tmp)
         # Print the output to user
-        echo "---"
+        echo ""
         echo "Return Code: $return_code"
 
-        # Check expected output if defined
-        if [[ -n "${expected_outputs[$dir_key]}" ]]; then
-            if [[ "$output" != *"${expected_outputs[$dir_key]}"* ]]; then
-                echo "Error: Expected output '${expected_outputs[$dir_key]}' not found in output"
-                exit 1
-            fi
+        # Check expected return code if defined
+        if [[ $return_code -ne 0 ]]; then
+            echo "❌ Failure: Expected return code 0; got return code $return_code"
+            exit 1
         fi
 
-        # Check expected return code if defined
-        if [[ -n "${expected_return_codes[$dir_key]}" ]]; then
-            if [[ $return_code -ne ${expected_return_codes[$dir_key]} ]]; then
-                echo "Error: Exercise failed; Expected return code ${expected_return_codes[$dir_key]}; got return code $return_code"
+        # Iterate over all expected output strings for this test
+        # Iterate through all expected outputs for this key
+        idx=0
+        while true; do
+            val="${expected_outputs["$dir_key[$idx]"]}"
+            if [ -z "$val" ]; then
+                break
+            fi
+            if ! echo "$output" | grep -Fq -- "$val"; then
+                echo "❌ Failure: '$val' not found in output"
                 exit 1
             fi
-        fi
+            idx=$((idx + 1))
+        done
 
         echo "✅ Exercise passed!"
         touch "$PASSED_FILE"  # Mark as passed
