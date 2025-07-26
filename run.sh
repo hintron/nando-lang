@@ -143,12 +143,16 @@ else
         echo "Run command ⏩"
         echo "    $EXECUTABLE_FULL"
 
-        echo "Program output:"
+        echo "Program output (with line numbers):"
         echo ""
         # Capture output and return code
         output=$("$EXECUTABLE_FULL" 2>&1)
         return_code=$?
-        echo "$output"
+        output_line_number=1
+        while IFS= read -r line; do
+            echo "$output_line_number: $line"
+            ((output_line_number++))
+        done <<< "$output"
         # Print the output to user
         echo ""
         echo "Return Code: $return_code"
@@ -180,7 +184,11 @@ else
             echo "❌ Failure: Expected output did not match program output"
             echo "The expected output must contain lines that start with these phrases (case sensitive):"
             echo ""
-            echo "$expected_output"
+            output_line_number=1
+            while IFS= read -r line; do
+                echo "$output_line_number: $line"
+                ((output_line_number++))
+            done <<< "$expected_output"
             echo ""
             exit 1
         fi
