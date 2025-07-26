@@ -74,6 +74,13 @@ Exercises to create:
   * https://stackoverflow.com/questions/42587607/why-is-imul-used-for-multiplying-unsigned-numbers
   * https://www.computerenhance.com/p/q-and-a-22-2023-08-15?utm_campaign=post&utm_medium=web&timestamp=394
 
+* Gulliver's Travels: Write a program with large 64-bit numbers, and print out
+  each byte via masks. Show that the ints are little endian in memory. Could
+  also convert to an array of uint8s to show memory contents. Show that
+  single-byte values are the same order either way. Have some array of u8s,
+  create a u16 with the MSB 1 and LSB 0. Guess the value (256).
+  Teaches endianness, byte manipulation, integers, integer ranges, MSB.
+
 * My first floating point inaccuracies: Write a program that accumulates
   floating point inaccuracies. Also, do the same thing in Python and Javascript,
   and point out that everything uses IEEE floating point under the hood. Maybe
