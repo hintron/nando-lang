@@ -3,99 +3,159 @@
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
 BUILD_TARGET="main"
+SKIP_INIT="false"
+CLEAN="false"
+RESET="false"
 while [[ $# -gt 0 ]]; do
     case "$1" in
-        --solution|-s)
-            BUILD_TARGET="solution"
-            shift
-            ;;
-        --help|-h)
-            echo "Usage: $0 [--solution|-s] [--help|-h]"
-            echo "  --solution, -s   Build and run exercise solutions instead of exercises. Solutions"
-            echo "                   should all be compilable and pass all tests."
-            echo "  --help, -h       Show this help message"
-            exit 0
-            ;;
-        *)
-            shift
-            ;;
+    --help|-h)
+        echo "run.sh: exercise builder and runner for nando-lang"
+        echo ""
+        echo "This script builds and runs the C exercises. The first time it runs,"
+        echo "it will initialize the exercises by deleting the solutions."
+        echo ""
+        echo "  --help, -h   Show this help message"
+        echo "  --clean      Delete executables and exit."
+        echo "  --reset      Reset progress and force a rebuild and rerun of all exercises."
+        exit 0
+        ;;
+    --clean)
+        CLEAN="true"
+        shift
+        ;;
+    --reset)
+        RESET="true"
+        shift
+        ;;
+    # Undocumented: This skips the init step and builds and runs exercise
+    # solutions instead of exercises. For solution development.
+    --dev)
+        BUILD_TARGET="solution"
+        SKIP_INIT="true"
+        shift
+        ;;
+    *)
+        shift
+        ;;
     esac
 done
 
-# Define expected outputs and return codes for each exercise
-declare -A expected_outputs
-declare -A expected_return_codes
 
-expected_outputs["00-hello-world"]="Hello, world!"
-expected_return_codes["00-hello-world"]=0
-expected_return_codes["01-my-first-segfault"]=139
+if [ "$CLEAN" = "true" ]; then
+    echo "Deleting all .bin files..."
+    find "$SCRIPT_DIR/exercises" -name "*.bin" -type f -delete
+    # Delete all solution files
+    find "$SCRIPT_DIR/exercises" -name "solution.c" -type f -delete
+elif [ "$SKIP_INIT" = "false" ] && [ -f "$SCRIPT_DIR/exercises/00-hello-world/solution.c" ]; then
+    echo "Initializing exercises..."
+    # Deleting all .bin files
+    find "$SCRIPT_DIR/exercises" -name "*.bin" -type f -delete
+    # Deleting all solutions to the exercises to avoid temptation
+    find "$SCRIPT_DIR/exercises" -name "solution.c" -type f -delete
+    # Making a copy of every main.c as original.c
+    find "$SCRIPT_DIR/exercises" -name "main.c" -type f -exec sh -c 'cp "$1" "$(dirname "$1")/original.c"' _ {} \;
 
-# Run each exercise
-BUILD_FILE="$BUILD_TARGET.c"
-BUILD_OUTPUT="$BUILD_TARGET.bin"
-for dir in "$SCRIPT_DIR/exercises"/*/; do
-    if [ ! -d "$dir" ]; then
-        continue
+    # Now, print out instructions for how to run the exercises
+    echo "Welcome to nando-lang C exercises!"
+    echo "************************************************************************"
+    echo "To run the exercises, use the following command:"
+    echo "  ./run.sh"
+    echo ""
+    echo "The first exercise will fail, because you haven't fixed it yet!"
+    echo ""
+    echo "Edit exercise file 00-hello-world/main.c and try compiling and running"
+    echo "it until it passes. Then move on to exercise 01 and repeat."
+    echo ""
+    echo "If you mess up your file, you can always refer to the starting point of original.c."
+    echo "If you get stumped and need to look at the solution, visit"
+    echo "https://github.com/hintron/nando-lang and view the solution files there."
+    echo ""
+    echo "Good luck! Remember, the goal is to learn and have fun with C programming!"
+    echo ""
+    echo "(Avoid the temptation to look at solutions or to use AI - these exercises"
+    echo "are designed to help you learn by doing, so try to solve them on your own,"
+    echo "and type them out manually.)"
+    echo ""
+else
+    if [ "$RESET" = "true" ]; then
+        echo "Resetting progress and forcing rebuild and rerun of all exercises"
+        find "$SCRIPT_DIR/exercises" -name ".passed*" -type f -delete
     fi
 
-    dir_key=${dir%/}
+    declare -A expected_outputs
+    declare -A expected_return_codes
 
-    PASSED_FILE="$dir/.passed-$BUILD_TARGET"
-    if [ -f "$PASSED_FILE" ]; then
-        echo "* Exercise $dir_key: Already passed! (run clean.sh --clear to reset progress)"
-        continue
-    fi
+    expected_outputs["00-hello-world"]="Hello, world!"
+    expected_return_codes["00-hello-world"]=0
+    expected_return_codes["01-my-first-segfault"]=139
 
-    echo "* Exercise $dir_key"
-    echo "*********************************************************************"
+    # Run each exercise
+    BUILD_FILE="$BUILD_TARGET.c"
+    BUILD_OUTPUT="$BUILD_TARGET.bin"
+    for dir in "$SCRIPT_DIR/exercises"/*/; do
+        if [ ! -d "$dir" ]; then
+            continue
+        fi
 
-    BUILD_FILE_FULL="$dir_key/$BUILD_FILE"
-    BUILD_OUTPUT_FULL="$dir_key/$BUILD_OUTPUT"
-    echo "Building $BUILD_FILE_FULL"
-    if ! gcc "$BUILD_FILE_FULL" -o "$BUILD_OUTPUT_FULL"; then
-        echo "Error: Failed to build. Please fix build failures and complete the task."
-        exit 1
-    fi
-    echo "Running $BUILD_OUTPUT_FULL"
-    cd "$dir" || exit
+        dir_key=${dir%/}
 
-    if [ ! -f "$BUILD_OUTPUT_FULL" ]; then
-        echo "Error: $BUILD_OUTPUT_FULL not found in $dir; cannot run exercise."
-        exit 1
-    fi
+        PASSED_FILE="$dir/.passed-$BUILD_TARGET"
+        if [ -f "$PASSED_FILE" ]; then
+            echo "* Exercise $dir_key: Already passed! (run run.sh --reset to reset progress)"
+            continue
+        fi
 
-    echo "Output:"
-    echo "---"
-    # Capture output and return code
-    # output=$(./main.bin 2>&1 | tee /tmp/exercise_output.tmp)
-    output=$("$BUILD_OUTPUT_FULL" 2>&1)
-    return_code=$?
-    echo "$output"
-    # output=$(cat /tmp/exercise_output.tmp)
-    # Print the output to user
-    echo "---"
-    echo "Return Code: $return_code"
+        echo "* Exercise $dir_key"
+        echo "*********************************************************************"
 
-    # Check expected output if defined
-    if [[ -n "${expected_outputs[$dir_key]}" ]]; then
-        if [[ "$output" != *"${expected_outputs[$dir_key]}"* ]]; then
-            echo "Error: Expected output '${expected_outputs[$dir_key]}' not found in output"
+        BUILD_FILE_FULL="$dir_key/$BUILD_FILE"
+        BUILD_OUTPUT_FULL="$dir_key/$BUILD_OUTPUT"
+        echo "Building $BUILD_FILE_FULL"
+        if ! gcc "$BUILD_FILE_FULL" -o "$BUILD_OUTPUT_FULL"; then
+            echo "Error: Failed to build. Please fix build failures and complete the task."
             exit 1
         fi
-    fi
+        echo "Running $BUILD_OUTPUT_FULL"
+        cd "$dir" || exit
 
-    # Check expected return code if defined
-    if [[ -n "${expected_return_codes[$dir_key]}" ]]; then
-        if [[ $return_code -ne ${expected_return_codes[$dir_key]} ]]; then
-            echo "Error: Exercise failed; Expected return code ${expected_return_codes[$dir_key]}; got return code $return_code"
+        if [ ! -f "$BUILD_OUTPUT_FULL" ]; then
+            echo "Error: $BUILD_OUTPUT_FULL not found in $dir; cannot run exercise."
             exit 1
         fi
-    fi
 
-    echo "Exercise completed!"
-    touch "$PASSED_FILE"  # Mark as passed
-    cd ..
-done
+        echo "Output:"
+        echo "---"
+        # Capture output and return code
+        # output=$(./main.bin 2>&1 | tee /tmp/exercise_output.tmp)
+        output=$("$BUILD_OUTPUT_FULL" 2>&1)
+        return_code=$?
+        echo "$output"
+        # output=$(cat /tmp/exercise_output.tmp)
+        # Print the output to user
+        echo "---"
+        echo "Return Code: $return_code"
 
-echo "========================================================================="
-echo "All exercises completed successfully!"
+        # Check expected output if defined
+        if [[ -n "${expected_outputs[$dir_key]}" ]]; then
+            if [[ "$output" != *"${expected_outputs[$dir_key]}"* ]]; then
+                echo "Error: Expected output '${expected_outputs[$dir_key]}' not found in output"
+                exit 1
+            fi
+        fi
+
+        # Check expected return code if defined
+        if [[ -n "${expected_return_codes[$dir_key]}" ]]; then
+            if [[ $return_code -ne ${expected_return_codes[$dir_key]} ]]; then
+                echo "Error: Exercise failed; Expected return code ${expected_return_codes[$dir_key]}; got return code $return_code"
+                exit 1
+            fi
+        fi
+
+        echo "Exercise completed!"
+        touch "$PASSED_FILE"  # Mark as passed
+        cd ..
+    done
+
+    echo "========================================================================="
+    echo "All exercises completed successfully!"
+fi

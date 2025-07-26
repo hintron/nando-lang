@@ -7,11 +7,17 @@ C programming language and basic CPU architecture.
 # Quickstart
 
 Go to https://github.com/hintron/nando-lang/releases and download the source
-code and extract it to a directory (don't use Git to clone it).
+code. Extract it to a directory (don't use Git to clone it).
 
-Inside the directory, run `init.sh` once in a terminal and follow the instructions!
+In a terminal, go to that directory and do
+```
+./run.sh
+```
 
-(You may do `git init` after that, if you use Git to save your work.)
+Then, follow the instructions! The instructions will tell you to edit the first
+exercise, then rerun `run.sh` to build and run the tests to see if it passes.
+
+(After running `run.sh`, you may do `git init` if you use Git to save your work.)
 
 
 # Exercises:
