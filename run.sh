@@ -1,5 +1,14 @@
 #!/bin/bash
 
+# Use a flat array to hold expected outputs with keys and values
+expected_outputs=(
+    "00-hello-world:Hello, world!"
+    "01-my-first-segfault:x addr: 0x"
+    "01-my-first-segfault:x val: 1337"
+    "01-my-first-segfault:y addr: 0x"
+    "01-my-first-segfault:y val: 3337"
+)
+
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
 BUILD_TARGET="main"
@@ -82,15 +91,6 @@ else
         find "$SCRIPT_DIR/exercises" -name ".passed*" -type f -delete
     fi
 
-    declare -A expected_outputs
-
-    # Use arrays for each key to hold multiple expected outputs
-    expected_outputs["00-hello-world-0"]="Hello, world!"
-    expected_outputs["01-my-first-segfault-0"]="x addr: 0x"
-    expected_outputs["01-my-first-segfault-1"]="x val: 1337"
-    expected_outputs["01-my-first-segfault-2"]="y addr: 0x"
-    expected_outputs["01-my-first-segfault-3"]="y val: 3337"
-
     # Run each exercise
     BUILD_FILE="$BUILD_TARGET.c"
     BUILD_OUTPUT="$BUILD_TARGET.bin"
@@ -150,20 +150,19 @@ else
             exit 1
         fi
 
-        # Iterate over all expected output strings for this test
-        # Iterate through all expected outputs for this key
-        idx=0
-        while true; do
-            key="$dir_key-$idx"
-            val="${expected_outputs["$key"]}"
-            if [ -z "$val" ]; then
-                break
+        # Parse expected outputs into a map for easier lookup
+        for entry in "${expected_outputs[@]}"; do
+            key="${entry%%:*}"
+            val="${entry#*:}"
+
+            if [[ "$key" != "$dir_key" ]]; then
+                continue
             fi
+
             if ! echo "$output" | grep -Fq -- "$val"; then
                 echo "❌ Failure: '$val' not found in output"
                 exit 1
             fi
-            idx=$((idx + 1))
         done
 
         echo "✅ Exercise passed!"
