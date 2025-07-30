@@ -203,3 +203,39 @@ and xor.
 ### ? word search interview question, with massive hints on how to do it ?
 ### ? Use other interesting interview questions, with massive hints?
 ### ? Use problems from algorithm design textbooks?
+
+
+# Architecture Idea
+
+Instead of a run.sh script, which does all the work and magically compiles and
+runs things, instead, give the user a build command (depending on the platform)
+and make them build things in their own terminal. This will help them learn
+about compiler, compile errors, how to run the program, etc.
+
+Then, I will request that they submit their program to my C-based "checker"
+program (with some basic checks to make sure they didn't submit a .c file and
+that the program is executable). My checker code will be contained in a single C
+file, so it will build quickly and the build command will be a simple one-liner
+that they can run themselves.
+
+For each exercise, I will give them a single build command that they will copy
+and paste to run themselves. (Mention ctrl+shift+C or cmd+C shortcuts.)
+
+The checker program will have a simple hidden file that keeps track of state,
+and that state can be cleared. It can be an append-only database text file, with
+the following format, separated by spaces:
+
+```
+<exercise_number>_<attempt_number>_<1 for pass,0 for fail>
+```
+
+When running the checker with no arguments, it will
+* tell the user what file to edit (what folder to open in VSCode)
+* print out the build command for the exercise
+* print out the command to run the exercise
+* print out the command to run the checker on the binary
+* If it passes, repeat steps for next exercise
+* If that was the last exercise, print completion message.
+* If the test fails, give encouragement and tell them to read the readme for
+  info.
+
