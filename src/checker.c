@@ -1,4 +1,6 @@
 #include <stdio.h>
+#include <stdint.h>
+#include <stdbool.h>
 
 #define TOTAL_EXERCISES 2
 
@@ -30,6 +32,7 @@ typedef struct {
     char *output_file; // Output file for the exercise
     int debug_mode;    // Debug mode flag (0 or 1)
     int verbose_mode;  // Verbose mode flag (0 or 1)
+    bool print_help;
 } arg_t;
 
 
@@ -45,10 +48,46 @@ typedef struct {
 } progress_item_t;
 
 
-// TODO:
-arg_t *checker_parse_args(int argc, char **argv, arg_t *args) {
-    printf("TODO: Parse args into arg_t...\n");
+char *usage_msg = "USAGE: checker [your_program] [-h]\n";
+char *help_msg =
+"\n"
+"Runs the checker on your program for the next exercise to pass off.\n"
+"\n"
+"[your_program]    The program to check for the current exercise.\n"
+"-h|--help]        Print this message.\n"
+;
+
+arg_t checker_parse_args(int argc, char **argv) {
+    arg_t args = {0};
+    char *program_name = argv[0];
+    int curr_arg_index = 1;
+    while (curr_arg_index < argc) {
+        bool single_option = false;
+        bool double_option = false;
+        char *curr_arg = argv[curr_arg_index];
+        if (curr_arg[0] && curr_arg[0] == '-') {
+            if (curr_arg[1] && curr_arg[1] == '-') {
+                double_option = true;
+            } else {
+                single_option = true;
+            }
+
+            if (
+                (single_option && curr_arg[1] == 'h') ||
+                (double_option && curr_arg[2] == 'h')
+            ) {
+                args.print_help = true;
+            }
+        }
+        curr_arg_index++;
+    }
     return args;
+}
+
+void print_help_msg() {
+    printf("%s", usage_msg);
+    printf("%s", help_msg);
+    printf("\n");
 }
 
 progress_item_t *checker_parse_progress_state(
