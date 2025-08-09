@@ -15,6 +15,9 @@ jobs:
       matrix:
         os: [ubuntu-latest, macos-15]
         architecture: [x64, arm64]
+        exclude:
+          - os: macos-15
+            architecture: x64
 
     steps:
       - name: Checkout code
