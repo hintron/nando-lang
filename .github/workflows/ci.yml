@@ -1,0 +1,36 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up C compiler
+        run: |
+          if [[ "$RUNNER_OS" == "Linux" ]]; then
+            sudo apt-get install build-essential
+          elif [[ "$RUNNER_OS" == "macOS" ]]; then
+            brew install gcc
+          fi
+
+      - name: Compile checker.c
+        run: |
+          gcc -Wall -o checker src/checker.c
+
+      - name: Run the checker
+        run: |
+          ./checker -h
