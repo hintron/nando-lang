@@ -103,7 +103,6 @@ int get_progress_data(
     progress_item_t *out_progress_items
 ) {
     int rc = 0;
-    int processed_progress_items = 0;
     FILE *fp = fopen(progress_file, "r+");
     if (fp) {
         for (int i = 0; i < total_exercises; i++) {
@@ -121,7 +120,6 @@ int get_progress_data(
                 );
             }
             if (rc2 == 3) {
-                processed_progress_items++;
                 printf("Exercise %d (%s):\n", i, g_exercises[i].name);
                 printf(
                     "    status: %s; fail count: %d\n",
