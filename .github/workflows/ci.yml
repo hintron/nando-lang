@@ -26,16 +26,17 @@ jobs:
             sudo apt-get install clang
           elif [[ "$RUNNER_OS" == "macOS" ]]; then
             brew install gcc
-            brew install clang
+            # clang is already installed by default
           fi
-      - name: Compile checker.c with gcc
+      - name: Compile checker.c with gcc and check output
         run: |
-          gcc -Werror -Wall -o checker src/checker.c
+          gcc -Werror -Wall -o checker-gcc src/checker.c
 
       - name: Compile checker.c with clang
         run: |
-          clang -Werror -Wall -o checker src/checker.c
+          clang -Werror -Wall -o checker-clang src/checker.c
 
       - name: Run the checker
         run: |
-          ./checker -h
+          ./checker-gcc -h
+          ./checker-clang -h
