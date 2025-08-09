@@ -2,12 +2,6 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-////////////////////////////////
-// #defines
-////////////////////////////////
-
-#define TOTAL_EXERCISES sizeof(g_exercises) / sizeof(g_exercises[0])
-#define PROGRESS_FILE ".progress.txt"
 // https://stackoverflow.com/questions/47045629/is-it-legal-to-use-elif-with-ifdef
 // Each platform implementation file will have platform-specific functionality
 // that will be called with `platform_xxx()` functions
@@ -49,12 +43,13 @@ typedef struct {
 
 
 ////////////////////////////////
-// Globals
+// Globals and defines
 ////////////////////////////////
 exercise_info_t g_exercises[] = {
     {"Hello, world!", "Expected output 1"},
     {"My first segfault", "Expected output 2"}
 };
+#define TOTAL_EXERCISES sizeof(g_exercises) / sizeof(g_exercises[0])
 char *usage_msg = "USAGE: checker [your_program] [-h]\n";
 char *help_msg =
 "\n"
@@ -101,15 +96,52 @@ void print_help_msg() {
     printf("\n");
 }
 
-// progress_item_t *checker_parse_progress_state(
-//     char *progress_file_bytes,
-//     progress_item_t *progress_items,
-//     int *num_items
-// ) {
-//     printf("TODO: Parse progress file bytes into a progress_item_t array...\n");
-//     // TODO: Fill out the empty progress_items array
-//     return progress_items;
-// }
+// Fill a pre-allocated progress_item_t array with progress data from progress_file
+// g_
+int get_progress_data(
+    char *progress_file,
+    int total_exercises,
+    progress_item_t *out_progress_items
+) {
+    int rc = 0;
+    int processed_progress_items = 0;
+    FILE *fp = fopen(progress_file, "r+");
+    if (fp) {
+        for (int i = 0; i < total_exercises; i++) {
+            progress_item_t *item = &out_progress_items[i];
+            int rc2 = fscanf(fp, "%d %d %d",
+                &item->exercise_number,
+                &item->status,
+                &item->fail_count
+            );
+            if (item->exercise_number != i) {
+                printf(
+                    "Error: exercise number mismatch (expected %d, got %d)\n",
+                    i,
+                    item->exercise_number
+                );
+            }
+            if (rc2 == 3) {
+                processed_progress_items++;
+                printf("Exercise %d (%s):\n", i, g_exercises[i].name);
+                printf(
+                    "    status: %s; fail count: %d\n",
+                    item->status == 1 ? "COMPLETED" : "UNFINISHED",
+                    item->fail_count
+                );
+            } else {
+                printf("Error reading progress file at exercise %d (fscanf() rc = %d)\n", i, rc2);
+                rc = rc2;
+                break;
+            }
+        }
+        fclose(fp);
+    } else {
+        printf("Progress file '%s' not found. Starting from scratch.\n", progress_file);
+    }
+
+    return rc;
+}
 
 // TODO:
 void checker_select_exercise() {
@@ -129,6 +161,7 @@ int checker_run_exercise() {
 // For now, just do a single main and try to use c std lib functions
 ////////////////////////////////
 int main(int argc, char **argv) {
+    int rc = 0;
     arg_t args = checker_parse_args(argc, argv);
     if (args.print_help) {
         print_help_msg();
@@ -139,47 +172,15 @@ int main(int argc, char **argv) {
     printf("Number of items in exercises: %ld\n", sizeof(g_exercises) / sizeof(g_exercises[0]));
     // Get progress state from the progress file
     progress_item_t progress_items[TOTAL_EXERCISES] = {0};
-    int processed_progress_items = 0;
-    FILE *fp = fopen(PROGRESS_FILE, "r+");
-    if (fp) {
-        for (int i = 0; i < TOTAL_EXERCISES; i++) {
-            progress_item_t *item = &progress_items[i];
-            int rc = fscanf(fp, "%d %d %d",
-                &item->exercise_number,
-                &item->status,
-                &item->fail_count
-            );
-            if (item->exercise_number != i) {
-                printf(
-                    "Error: exercise number mismatch (expected %d, got %d)\n",
-                    i,
-                    item->exercise_number
-                );
-            }
-            if (rc == 3) {
-                processed_progress_items++;
-                printf("Exercise %d (%s):\n", i, g_exercises[i].name);
-                printf(
-                    "    status: %s; fail count: %d\n",
-                    item->status == 1 ? "COMPLETED" : "UNFINISHED",
-                    item->fail_count
-                );
-            } else {
-                printf("Error reading progress file at exercise %d (fscanf() rc = %d)\n", i, rc);
-                break;
-            }
-        }
-        fclose(fp);
-    } else {
-        printf("Progress file '%s' not found. Assuming it doesn't exist.\n", PROGRESS_FILE);
+    rc = get_progress_data(".progress.txt", TOTAL_EXERCISES, progress_items);
+    if (rc != 0) {
+        return 1;
     }
-
-    // checker_parse_progress_state(NULL, NULL, 0);
     // TODO: Pass progress state into checker_select_exercise()
-    checker_select_exercise();
+    // int exercise_to_run = checker_select_exercise(progress_items);
     // TODO: Run exercise executable and save stdout/stderr to a string.
     // Pass output to the checker
-    checker_run_exercise();
+    // checker_run_exercise(exercise_to_run, args.input_file, exercise_output);
 
     // TODO: Write out the exercise state to the state file
 
