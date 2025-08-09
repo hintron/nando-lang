@@ -1,4 +1,5 @@
 // Linux/MacOS port of the checker program
+#include <fcntl.h>
 
 int main(int argc, char **argv) {
     arg_t args = checker_parse_args(argc, argv);
@@ -8,6 +9,11 @@ int main(int argc, char **argv) {
     }
 
     // TODO: Get progress state from the progress file
+    int fd = open("progress.txt", O_WRONLY | O_CREAT, 0644);
+    if (fd < 0) {
+        // handle error
+        write(STDERR_FILENO, "Failed to open progress file\n", 30);
+    }
     checker_parse_progress_state(NULL, NULL, 0);
     // TODO: Pass progress state into checker_select_exercise()
     checker_select_exercise();
