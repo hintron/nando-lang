@@ -18,6 +18,24 @@
 
 
 ////////////////////////////////
+// Globals and defines
+////////////////////////////////
+exercise_info_t g_exercises[] = {
+    {"Hello, world!", "Expected output 1"},
+    {"My first segfault", "Expected output 2"}
+};
+#define TOTAL_EXERCISES sizeof(g_exercises) / sizeof(g_exercises[0])
+char *usage_msg = "USAGE: checker [your_program] [-h]\n";
+char *help_msg =
+"\n"
+"Runs the checker on your program for the next exercise to pass off.\n"
+"\n"
+"[your_program]    The program to check for the current exercise.\n"
+"-h|--help]        Print this message.\n"
+;
+
+
+////////////////////////////////
 // Struct Definitions
 ////////////////////////////////
 
@@ -42,22 +60,6 @@ typedef struct {
 } exercise_info_t;
 
 
-////////////////////////////////
-// Globals and defines
-////////////////////////////////
-exercise_info_t g_exercises[] = {
-    {"Hello, world!", "Expected output 1"},
-    {"My first segfault", "Expected output 2"}
-};
-#define TOTAL_EXERCISES sizeof(g_exercises) / sizeof(g_exercises[0])
-char *usage_msg = "USAGE: checker [your_program] [-h]\n";
-char *help_msg =
-"\n"
-"Runs the checker on your program for the next exercise to pass off.\n"
-"\n"
-"[your_program]    The program to check for the current exercise.\n"
-"-h|--help]        Print this message.\n"
-;
 
 ////////////////////////////////
 // Functions
