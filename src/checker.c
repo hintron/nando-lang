@@ -97,7 +97,7 @@ void print_help_msg() {
 
 // Fill a pre-allocated progress_item_t array with progress data from progress_file
 // g_
-int get_progress_data(
+int checker_get_progress_data(
     char *progress_file,
     int total_exercises,
     progress_item_t *out_progress_items
@@ -169,7 +169,7 @@ int main(int argc, char **argv) {
     printf("Number of items in exercises: %ld\n", sizeof(g_exercises) / sizeof(g_exercises[0]));
     // Get progress state from the progress file
     progress_item_t progress_items[TOTAL_EXERCISES] = {0};
-    rc = get_progress_data(".progress.txt", TOTAL_EXERCISES, progress_items);
+    rc = checker_get_progress_data(".progress.txt", TOTAL_EXERCISES, progress_items);
     if (rc != 0) {
         return 1;
     }
