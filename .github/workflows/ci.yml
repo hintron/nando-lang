@@ -23,13 +23,18 @@ jobs:
         run: |
           if [[ "$RUNNER_OS" == "Linux" ]]; then
             sudo apt-get install build-essential
+            sudo apt-get install clang
           elif [[ "$RUNNER_OS" == "macOS" ]]; then
             brew install gcc
+            brew install clang
           fi
-
-      - name: Compile checker.c
+      - name: Compile checker.c with gcc
         run: |
-          gcc -Wall -o checker src/checker.c
+          gcc -Werror -Wall -o checker src/checker.c
+
+      - name: Compile checker.c with clang
+        run: |
+          clang -Werror -Wall -o checker src/checker.c
 
       - name: Run the checker
         run: |
