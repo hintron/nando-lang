@@ -100,9 +100,11 @@ void print_help_msg() {
 int checker_get_progress_data(
     char *progress_file,
     int total_exercises,
-    progress_item_t *out_progress_items
+    progress_item_t *out_progress_items,
+    int *out_current_exercise
 ) {
     int rc = 0;
+    *out_current_exercise = -1;
     FILE *fp = fopen(progress_file, "r+");
     if (fp) {
         for (int i = 0; i < total_exercises; i++) {
@@ -126,6 +128,10 @@ int checker_get_progress_data(
                     item->status == 1 ? "COMPLETED" : "UNFINISHED",
                     item->fail_count
                 );
+                // Record the first unfinished exercise. That's the next one to do
+                if (item->status == 0 && *out_current_exercise == -1) {
+                    *out_current_exercise = i;
+                }
             } else {
                 printf("Error reading progress file at exercise %d (fscanf() rc = %d)\n", i, rc2);
                 rc = rc2;
@@ -140,16 +146,13 @@ int checker_get_progress_data(
     return rc;
 }
 
-// TODO:
-void checker_select_exercise() {
-    printf("TODO: Look at progress state and determine which exercise to check next...\n");
-    return;
-}
-
-// TODO:
-int checker_run_exercise() {
-    printf("Hello, world!\n");
-    printf("TODO: \n");
+int checker_run_exercise(int exercise_number, char *input_file) {
+    if (exercise_number > 0) {
+        printf("Starting fresh!\n");
+        printf("TODO: Introductory blurb\n");
+    } else {
+        printf("TODO: Running exercise %d with input file %s\n", exercise_number, input_file);
+    }
     return 0;
 }
 
@@ -169,17 +172,18 @@ int main(int argc, char **argv) {
     printf("Number of items in exercises: %ld\n", sizeof(g_exercises) / sizeof(g_exercises[0]));
     // Get progress state from the progress file
     progress_item_t progress_items[TOTAL_EXERCISES] = {0};
-    rc = checker_get_progress_data(".progress.txt", TOTAL_EXERCISES, progress_items);
+    int current_exercise;
+    rc = checker_get_progress_data(".progress.txt", TOTAL_EXERCISES, progress_items, &current_exercise);
     if (rc != 0) {
         return 1;
     }
-    // TODO: Pass progress state into checker_select_exercise()
-    // int exercise_to_run = checker_select_exercise(progress_items);
-    // TODO: Run exercise executable and save stdout/stderr to a string.
-    // Pass output to the checker
-    // checker_run_exercise(exercise_to_run, args.input_file, exercise_output);
 
-    // TODO: Write out the exercise state to the state file
+    // Run exercise executable and save stdout/stderr to a string.
+    // Pass output to the checker
+
+    checker_run_exercise(current_exercise, args.input_file);
+
+    // Write out the exercise state to the state file
 
 
     return 0;
