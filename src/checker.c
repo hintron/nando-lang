@@ -65,7 +65,6 @@ char *help_msg =
 
 arg_t checker_parse_args(int argc, char **argv) {
     arg_t args = {0};
-    char *program_name = argv[0];
     int curr_arg_index = 1;
     while (curr_arg_index < argc) {
         bool single_option = false;
