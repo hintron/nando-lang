@@ -1,5 +1,7 @@
 # Nando Lang
 
+[![CI](https://github.com/hintron/nando-lang/actions/workflows/ci.yml/badge.svg)](https://github.com/hintron/nando-lang/actions/workflows/ci.yml)
+
 This repo contains a set of beginning exercises and tasks to help you learn the
 C programming language and basic CPU architecture.
 
