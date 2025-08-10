@@ -106,6 +106,8 @@ arg_t checker_parse_args(int argc, char **argv) {
                 args.print_help = true;
             } else if (double_option && curr_arg[2] == 'd') {
                 args.dev_mode = true;
+            } else if (args.input_file == NULL) {
+                args.input_file = curr_arg;
             } else {
                 args.unhandled_arg = curr_arg;
                 break;
