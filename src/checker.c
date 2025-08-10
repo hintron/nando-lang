@@ -212,11 +212,13 @@ void checker_delete_solutions() {
 }
 
 int checker_run_exercise(int exercise_number, char *input_file) {
-    if (exercise_number < 0) {
+    if (exercise_number < 0 && input_file == NULL) {
         printf("%s", text_introduction_msg);
     } else {
-        printf("TODO: Running exercise %d with input file %s\n", exercise_number, input_file);
+        printf("Running exercise %d with input file %s\n", exercise_number, input_file);
+        // TODO: Implement exercise running logic
     }
+
     return 0;
 }
 
