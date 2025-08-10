@@ -3,9 +3,9 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Task:
 // * Something is wrong with y_ptr. Fix it so that it points to y instead of NULL.
-// 
-// See https://github.com/hintron/nando-lang/blob/main/exercises/01-my-first-segfault/background.md
-// for more information on segfaults.
+//
+// See https://github.com/hintron/nando-lang/blob/main/docs/01-my-first-segfault.md
+// for more background information on segfaults.
 ////////////////////////////////////////////////////////////////////////////////
 #include <stdio.h>
 
