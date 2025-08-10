@@ -33,7 +33,7 @@ char *help_msg =
 "[your_program]    The program to check for the current exercise.\n"
 "-h|--help]        Print this message.\n"
 ;
-char *introduction_msg =
+char *text_introduction_msg =
 "Welcome to nando-lang C exercises!\n"
 "************************************************************************\n"
 "To run the exercises, use the following command:\n"
@@ -171,7 +171,7 @@ int checker_get_progress_data(
         }
         fclose(fp);
     } else {
-        printf("Progress file '%s' not found. Starting from scratch.\n", progress_file);
+        // Progress file not found - starting from scratch
     }
 
     return rc;
@@ -179,8 +179,7 @@ int checker_get_progress_data(
 
 int checker_run_exercise(int exercise_number, char *input_file) {
     if (exercise_number < 0) {
-        printf("Starting fresh!\n");
-        printf("TODO: Introductory blurb\n");
+        printf("%s", text_introduction_msg);
     } else {
         printf("TODO: Running exercise %d with input file %s\n", exercise_number, input_file);
     }
@@ -199,8 +198,6 @@ int main(int argc, char **argv) {
         return 0;
     }
 
-    printf("Size of exercises in bytes: %ld\n", sizeof(g_exercises));
-    printf("Number of items in exercises: %ld\n", sizeof(g_exercises) / sizeof(g_exercises[0]));
     // Get progress state from the progress file
     progress_item_t progress_items[TOTAL_EXERCISES] = {0};
     int current_exercise;
