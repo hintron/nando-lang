@@ -178,7 +178,7 @@ int checker_get_progress_data(
 }
 
 int checker_run_exercise(int exercise_number, char *input_file) {
-    if (exercise_number > 0) {
+    if (exercise_number < 0) {
         printf("Starting fresh!\n");
         printf("TODO: Introductory blurb\n");
     } else {
