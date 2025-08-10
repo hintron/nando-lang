@@ -16,18 +16,81 @@ the "Functions" lesson).
 
 # Quickstart
 
+### Download
+
 Go to https://github.com/hintron/nando-lang/releases and download the source
 code. Extract it to a directory (don't use Git to clone it).
 
-In a terminal, go to that directory and do
+Next, in a terminal program, go inside that directory:
+
 ```
-./run.sh
+cd <path-to-nando-lang-directory>
 ```
 
-Then, follow the instructions! The instructions will tell you to edit the first
-exercise, then rerun `run.sh` to build and run the tests to see if it passes.
+### Compile Checker Program
 
-(After running `run.sh`, you may do `git init` if you use Git to save your work.)
+Next, build the checker program with the following command:
+
+```
+# If on Linux:
+gcc src/checker.c -o checker
+# If on macOS
+clang src/checker.c -o checker
+```
+
+
+Next, run the checker with no arguments:
+
+```
+./checker
+```
+
+This will display an introductory blurb with your first instructions. These
+instructions will tell you what exercise to first start editing.
+
+### Edit, Compile, and Run Exercise Code
+
+Edit your source code files using a coding text editor like
+[VSCode](https://code.visualstudio.com/) or
+[NeoVim](https://github.com/neovim/neovim).
+
+
+Once you have edited the exercise, compile it in your terminal with this
+command:
+
+```
+# Linux
+gcc exercises/<exercise>/main.c -Wall
+# macOS
+clang exercises/<exercise>/main.c -Wall
+```
+
+Replace `<exercise>` with the exercise you are working on - use 
+[tab completion](https://en.wikipedia.org/wiki/Command-line_completion) to
+quickly select the exercise.
+
+(The `-Wall` is optional - it will display warnings that could indicate problems
+in your code, but these warnings do not prevent the code from being compiled.)
+
+This will compile your code and generate `a.out` if compilation succeeded.
+`a.out` is your compiled program. Each time you compile, `a.out` will get
+overwritten with the latest compiled changes to your program.
+
+Run `a.out` to make sure your program does what you wanted:
+
+```
+./a.out
+```
+
+When you are satisfied that it does what you want, give it to the checker to run
+and see if you pass the exercise!:
+
+```
+./checker a.out
+```
+
+If you pass, the checker will tell you the next exercise to work on.
+
 
 # C Reference Material
 
