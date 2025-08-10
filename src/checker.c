@@ -66,6 +66,7 @@ typedef struct {
     char *input_file;  // Input file for the exercise
     bool print_help;
     bool dev_mode;
+    char *unhandled_arg;
 } arg_t;
 
 typedef struct {
@@ -114,6 +115,9 @@ arg_t checker_parse_args(int argc, char **argv) {
                 args.print_help = true;
             } else if (double_option && curr_arg[2] == 'd') {
                 args.dev_mode = true;
+            } else {
+                args.unhandled_arg = curr_arg;
+                break;
             }
         }
         curr_arg_index++;
@@ -197,6 +201,10 @@ int main(int argc, char **argv) {
     if (args.print_help) {
         print_help_msg();
         return 0;
+    }
+    if (args.unhandled_arg != NULL) {
+        printf("ERROR: Unhandled argument: %s\n", args.unhandled_arg);
+        return 1;
     }
 
     // Get progress state from the progress file
