@@ -18,13 +18,13 @@
 
 
 ////////////////////////////////
-// Globals and defines
+// Text
 ////////////////////////////////
-exercise_info_t g_exercises[] = {
-    {"Hello, world!", "Expected output 1"},
-    {"My first segfault", "Expected output 2"}
-};
-#define TOTAL_EXERCISES sizeof(g_exercises) / sizeof(g_exercises[0])
+#define text_title_hello_world "Hello, world!\n"
+#define text_expected_output_hello_world "Expected output 1\n"
+#define text_title_my_first_segfault "My first segfault\n"
+#define text_expected_output_my_first_segfault "Expected output 2\n"
+
 char *usage_msg = "USAGE: checker [your_program] [-h]\n";
 char *help_msg =
 "\n"
@@ -33,6 +33,27 @@ char *help_msg =
 "[your_program]    The program to check for the current exercise.\n"
 "-h|--help]        Print this message.\n"
 ;
+char *introduction_msg =
+"Welcome to nando-lang C exercises!\n"
+"************************************************************************\n"
+"To run the exercises, use the following command:\n"
+"  ./checker\n"
+"\n"
+"The first exercise will fail, because you haven't fixed it yet!\n"
+"\n"
+"Edit exercise file 00-hello-world/main.c and try compiling and running\n"
+"it until it passes. Then move on to exercise 01 and repeat.\n"
+"\n"
+"If you mess up your file, you can always refer to the starting point of original.c.\n"
+"If you get stumped and need to look at the solution, visit\n"
+"https://github.com/hintron/nando-lang and view the solution files there.\n"
+"\n"
+"Good luck! Remember, the goal is to learn and have fun with C programming!\n"
+"\n"
+"(Avoid the temptation to look at solutions or to use AI - these exercises\n"
+"are designed to help you learn by doing, so try to solve them on your own,\n"
+"and type them out manually.)\n"
+"\n";
 
 
 ////////////////////////////////
@@ -59,7 +80,15 @@ typedef struct {
     char expected_output[1024];
 } exercise_info_t;
 
+////////////////////////////////
+// Globals
+////////////////////////////////
 
+exercise_info_t g_exercises[] = {
+    {text_title_hello_world, text_expected_output_hello_world},
+    {text_title_my_first_segfault, text_expected_output_my_first_segfault}
+};
+#define TOTAL_EXERCISES sizeof(g_exercises) / sizeof(g_exercises[0])
 
 ////////////////////////////////
 // Functions
