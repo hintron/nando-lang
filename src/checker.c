@@ -31,7 +31,7 @@ char *help_msg =
 "Runs the checker on your program for the next exercise to pass off.\n"
 "\n"
 "[your_program]    The program to check for the current exercise.\n"
-"-h|--help]        Print this message.\n"
+"-h|--help         Print this message.\n"
 ;
 char *text_introduction_msg =
 "Welcome to nando-lang C exercises!\n"
