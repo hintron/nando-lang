@@ -20,10 +20,10 @@
 ////////////////////////////////
 // Text
 ////////////////////////////////
-#define text_title_hello_world "Hello, world!\n"
-#define text_expected_output_hello_world "Expected output 1\n"
-#define text_title_my_first_segfault "My first segfault\n"
-#define text_expected_output_my_first_segfault "Expected output 2\n"
+#define text_title_00 "Hello, world!\n"
+#define text_expected_output_00 "Expected output 1\n"
+#define text_title_01 "My first segfault\n"
+#define text_expected_output_01 "Expected output 2\n"
 
 char *usage_msg = "USAGE: checker [your_program] [-h]\n";
 char *help_msg =
@@ -85,8 +85,8 @@ typedef struct {
 ////////////////////////////////
 
 exercise_info_t g_exercises[] = {
-    {text_title_hello_world, text_expected_output_hello_world},
-    {text_title_my_first_segfault, text_expected_output_my_first_segfault}
+    {text_title_00, text_expected_output_00},
+    {text_title_01, text_expected_output_01}
 };
 #define TOTAL_EXERCISES sizeof(g_exercises) / sizeof(g_exercises[0])
 
