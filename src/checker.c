@@ -211,6 +211,12 @@ void checker_delete_solutions() {
     remove_directory_unix(".solutions");
 }
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/wait.h>
+#include <signal.h>
+
 int checker_run_exercise(int exercise_number, char *input_file) {
     if (exercise_number < 0 && input_file == NULL) {
         printf("%s", text_introduction_msg);
@@ -222,7 +228,45 @@ int checker_run_exercise(int exercise_number, char *input_file) {
     }
 
     printf("Running exercise %d with input file %s\n", exercise_number, input_file);
-    // TODO: Implement exercise running logic
+
+    // Do Linux/macOS child fork of program
+    // See https://chatgpt.com/c/6896fe64-24e4-8322-869b-f0e32ef22a52
+
+    // TODO: Before fork, create a pipe in order to capture child process's stdout
+
+    pid_t pid = fork();
+
+    printf("pid: %d\n", pid);
+    if (pid == -1) {
+        printf("ERROR: fork failed\n");
+        return 1;
+    }
+
+    if (pid == 0) {
+        // Child process: replace with another program
+        // TODO: Debug this exec call
+        execlp(input_file, input_file, (char *)NULL);
+        printf("ERROR: Should not have got here after an exec call\n");
+        return 1;
+    }
+    // Parent process: wait for child to finish
+
+    int status;
+    if (waitpid(pid, &status, 0) == -1) {
+        printf("ERROR: waitpid failed\n");
+        return 1;
+    }
+
+    if (WIFSIGNALED(status)) {
+        int sig = WTERMSIG(status);
+        fprintf(stderr, "Child terminated by signal %d (%s)\n", sig, strsignal(sig));
+        if (sig == SIGSEGV) {
+            fprintf(stderr, "Segmentation fault detected\n");
+        }
+    } else if (WIFEXITED(status)) {
+        int code = WEXITSTATUS(status);
+        printf("Child exited with code %d\n", code);
+    }
 
     return 0;
 }
@@ -258,7 +302,10 @@ int main(int argc, char **argv) {
     // Run exercise executable and save stdout/stderr to a string.
     // Pass output to the checker
 
-    checker_run_exercise(current_exercise, args.input_file);
+    if (checker_run_exercise(current_exercise, args.input_file) != 0) {
+        printf("ERROR: Checker found problems with the program you provided\n");
+        return 1;
+    }
 
     // Write out the exercise state to the state file
 
