@@ -60,12 +60,12 @@ command:
 
 ```
 # Linux
-gcc exercises/<exercise>/main.c -Wall
+gcc exercises/<exercise>.c -Wall
 # macOS
-clang exercises/<exercise>/main.c -Wall
+clang exercises/<exercise>.c -Wall
 ```
 
-Replace `<exercise>` with the exercise you are working on - use 
+Replace `<exercise>.c` with the exercise you are working on - use 
 [tab completion](https://en.wikipedia.org/wiki/Command-line_completion) to
 quickly select the exercise.
 
