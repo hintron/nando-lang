@@ -182,6 +182,40 @@ int checker_get_progress_data(
     return rc;
 }
 
+// MGH TODO: This is platform-specific. Move it to unix_main.c
+#include <stdlib.h>
+#include <sys/stat.h>
+#include <dirent.h>
+#include <string.h>
+#include <unistd.h>
+void remove_directory_unix(const char *path) {
+    DIR *d = opendir(path);
+    if (!d) {
+        return;
+    }
+    struct dirent *entry;
+    char filepath[1024];
+    while ((entry = readdir(d)) != NULL) {
+        if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
+            continue;
+        snprintf(filepath, sizeof(filepath), "%s/%s", path, entry->d_name);
+        struct stat st;
+        if (stat(filepath, &st) == 0) {
+            if (S_ISDIR(st.st_mode)) {
+                remove_directory_unix(filepath);
+            } else {
+                remove(filepath);
+            }
+        }
+    }
+    closedir(d);
+    rmdir(path);
+}
+
+void checker_delete_solutions() {
+    remove_directory_unix(".solutions");
+}
+
 int checker_run_exercise(int exercise_number, char *input_file) {
     if (exercise_number < 0) {
         printf("%s", text_introduction_msg);
@@ -215,8 +249,9 @@ int main(int argc, char **argv) {
         return 1;
     }
 
-    if (args.dev_mode) {
-        // checker_delete_solutions();
+    // Delete the solutions directory if not in dev mode
+    if (!args.dev_mode) {
+        checker_delete_solutions();
     }
     // Run exercise executable and save stdout/stderr to a string.
     // Pass output to the checker
