@@ -32,6 +32,7 @@ char *help_msg =
 "\n"
 "[your_program]    The program to check for the current exercise.\n"
 "-h|--help         Print this message.\n"
+"--dev             Developer mode.\n"
 ;
 char *text_introduction_msg =
 "Welcome to nando-lang C exercises!\n"
@@ -63,10 +64,8 @@ char *text_introduction_msg =
 typedef struct {
     char *exercise;    // Name of the exercise to run
     char *input_file;  // Input file for the exercise
-    char *output_file; // Output file for the exercise
-    int debug_mode;    // Debug mode flag (0 or 1)
-    int verbose_mode;  // Verbose mode flag (0 or 1)
     bool print_help;
+    bool dev_mode;
 } arg_t;
 
 typedef struct {
@@ -113,6 +112,8 @@ arg_t checker_parse_args(int argc, char **argv) {
                 (double_option && curr_arg[2] == 'h')
             ) {
                 args.print_help = true;
+            } else if (double_option && curr_arg[2] == 'd') {
+                args.dev_mode = true;
             }
         }
         curr_arg_index++;
@@ -206,6 +207,9 @@ int main(int argc, char **argv) {
         return 1;
     }
 
+    if (args.dev_mode) {
+        // checker_delete_solutions();
+    }
     // Run exercise executable and save stdout/stderr to a string.
     // Pass output to the checker
 
