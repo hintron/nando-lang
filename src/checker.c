@@ -39,14 +39,13 @@ char *text_introduction_msg =
 "************************************************************************\n"
 "Try compiling exercises/00-hello-world.c. It will fail to compile.\n"
 "Fix that compiler error and make the exercise print the expected output.\n"
-
-"Good luck! Remember, the goal is to learn and have fun with C programming!\n"
+"Once your program is ready for submission, run the checker on the compiled output:\n"
 "\n"
-"(Avoid the temptation to look at solutions or to use AI - these exercises\n"
-"are designed to help you learn by doing, so try to solve them on your own,\n"
-"and type them out manually.)\n"
-"\n";
-
+"    ./checker <your_program>\n"
+"\n"
+"Good luck! Remember, the goal is to learn and have fun with C programming!\n"
+"************************************************************************\n"
+;
 
 ////////////////////////////////
 // Struct Definitions
