@@ -13,14 +13,16 @@
 
 // Platform code
 #include <dirent.h>
-#include <unistd.h>
+#include <errno.h>
+#include <fcntl.h>
 #include <sys/wait.h>
 #include <sys/stat.h>
-// #include <fcntl.h>
+#include <unistd.h>
 // #include <signal.h>
 
 #define OUTPUT_BUFFER_SIZE 1024
 #define FILEPATH_SIZE 1024
+#define INFINITE_LOOP_SECS 5
 
 void remove_directory_unix(const char *path) {
     DIR *d = opendir(path);
@@ -128,27 +130,62 @@ int unix_run_exercise(
     if (close(stdout_pipe[1]) == -1) { printf("ERROR: Parent close stdout pipe write end failed\n"); }
     if (close(stderr_pipe[1]) == -1) { printf("ERROR: Parent close stderr pipe write end failed\n"); }
 
-    // TODO: Read child process's stdout and stderr from the pipes and send it back to the caller
-    // TODO: Do this in a for loop with sleeps, for simplicity, and break when child returns (or time out if an infinite loop is detected. Child should never take longer than 30 seconds)
+    // Set pipes to non-blocking mode, so if the child hasn't output anything to
+    // stdout (infinite loop) or stderr (no error messages printed), it doesn't
+    // block forever at read().
+    // See TLPI 44.9;
+    int flags = fcntl(stdout_pipe[0], F_GETFL, 0);
+    if (flags == -1) {
+        printf("ERROR: fcntl get flags failed for stdout pipe [0]\n");
+    }
+    // Set child stdout to non-blocking
+    if (fcntl(stdout_pipe[0], F_SETFL, flags | O_NONBLOCK) == -1) {
+        printf("ERROR: fcntl set flags failed for stdout pipe [0]\n");
+    }
+    flags = fcntl(stderr_pipe[0], F_GETFL, 0);
+    if (flags == -1) {
+        printf("ERROR: fcntl get flags failed for stderr pipe [0]\n");
+    }
+    // Set child stderr to non-blocking
+    if (fcntl(stderr_pipe[0], F_SETFL, flags | O_NONBLOCK) == -1) {
+        printf("ERROR: fcntl set flags failed for stderr pipe [0]\n");
+    }
+    // Now, subsequent read() calls on STDOUT_FILENO will be non-blocking.
+    // Check errno for EWOULDBLOCK/EAGAIN to determine if no data is available.
+
+    // Read child process's stdout and stderr from the pipes and send it back to the caller
+    // Do this in a for loop with sleeps, for simplicity, and break when child
+    // returns (or time out if an infinite loop is detected. Child should never
+    // take longer than a few seconds)
 
     int child_status;
-    int infinite_loop_protector = 5;
+    int infinite_loop_protector = INFINITE_LOOP_SECS;
     bool child_running = true;
-    bool child_sent_bytes_yet = false;
     ssize_t total_bytes_read_stdout = 0;
     ssize_t total_bytes_read_stderr = 0;
     while (child_running) {
-        ssize_t bytes_read_stdout = read(stdout_pipe[0], &output_stdout[total_bytes_read_stdout], 8);
-        // TODO: When stderr gets no output, read() blocks forever.
-        // TODO: read() needs to become non-blocking to avoid blocking forever
-        // and so we can do infinite loop checking
-        // TODO: For now, hardcode stderr to 0
-        ssize_t bytes_read_stderr = 0;
-        // ssize_t bytes_read_stderr = read(stderr_pipe[0], &output_stderr[total_bytes_read_stderr], 8);
+        // Check child's stdout
+        errno = 0;
+        ssize_t bytes_read_stdout = read(stdout_pipe[0], &output_stdout[total_bytes_read_stdout], OUTPUT_BUFFER_SIZE);
+        if (bytes_read_stdout < 0) {
+            if (errno == EWOULDBLOCK || errno == EAGAIN) {
+                // No data available, not an error
+            } else {
+                printf("ERROR: Failed to read from stdout pipe\n");
+                return 1;
+            }
+        }
 
-        if (bytes_read_stdout < 0 || bytes_read_stderr < 0) {
-            printf("ERROR: Failed to read from pipe\n");
-            return 1;
+        // Now, check child's stderr
+        errno = 0;
+        ssize_t bytes_read_stderr = read(stderr_pipe[0], &output_stderr[total_bytes_read_stderr], OUTPUT_BUFFER_SIZE);
+        if (bytes_read_stderr < 0) {
+            if (errno == EWOULDBLOCK || errno == EAGAIN) {
+                // No data available, not an error
+            } else {
+                printf("ERROR: Failed to read from stderr pipe\n");
+                return 1;
+            }
         }
 
         // printf("bytes_read_stdout: %zd\n", bytes_read_stdout);
@@ -175,17 +212,13 @@ int unix_run_exercise(
         }
 
         // Only sleep if the child has already sent back bytes and is stalling for some reason
-        if (child_sent_bytes_yet) {
-            printf("Sleep 1\n");
+        if ((bytes_read_stdout <= 0) && (bytes_read_stderr <= 0)) {
             sleep(1);
             infinite_loop_protector--;
             if (infinite_loop_protector <= 0) {
-                printf("ERROR: Infinite loop detected\n");
+                printf("ERROR: Infinite loop detected (program did not finish running after %d seconds)\n", INFINITE_LOOP_SECS);
                 return 1;
             }
-        }
-        if (!child_sent_bytes_yet && (bytes_read_stdout == 0) && (bytes_read_stderr == 0)) {
-            child_sent_bytes_yet = true;
         }
 
         // Wait for child to finish
