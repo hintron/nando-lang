@@ -280,7 +280,7 @@ int main(int argc, char **argv) {
     // Get progress state from the progress file
     progress_item_t progress_items[TOTAL_EXERCISES] = {0};
     int current_exercise = 0;
-    rc = checker_get_progress_data(".progress.txt", TOTAL_EXERCISES, progress_items, &current_exercise);
+    rc = checker_read_progress_state(".progress.txt", TOTAL_EXERCISES, progress_items, &current_exercise);
     if (rc != 0) {
         return 1;
     }

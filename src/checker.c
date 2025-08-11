@@ -123,7 +123,7 @@ void print_help_msg() {
 
 // Fill a pre-allocated progress_item_t array with progress data from progress_file
 // Also, set the current exercise. If current exercise is -1, then all exercises are completed
-int checker_get_progress_data(
+int checker_read_progress_state(
     char *progress_file,
     int total_exercises,
     progress_item_t *out_progress_items,
