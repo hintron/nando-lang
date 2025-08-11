@@ -61,20 +61,49 @@ int unix_run_exercise(int exercise_number, char *input_file) {
 
     printf("Running exercise %d with input file %s\n", exercise_number, input_file);
 
-    // TODO: Before fork, create a pipe in order to capture child process's stdout
+    // Before fork, create a pipe in order to capture child process's stdout
+    // Item [1] is always the input into the pipe (write end), while [0] is the output (read end)
+    // See The Linux Programming Interface, Chapter 44
 
+    //         pipe
+    //      +-------+
+    // [1]  |data-->|  [0]
+    //      +-------+
+
+    // Since both parent and child will have access to both input and output of
+    // the pipe after a fork, we want to close the write end of the parent and
+    // the read end of the child so that we have a pipe from child to parent.
+    int stdout_pipe[2], stderr_pipe[2];
+    if (pipe(stdout_pipe) == -1 || pipe(stderr_pipe) == -1) {
+        printf("ERROR: Failed to set up one-way pipes from child to parent\n");
+        return 1;
+    }
     // Do Linux/macOS child fork of program
     // See https://chatgpt.com/c/6896fe64-24e4-8322-869b-f0e32ef22a52
     pid_t pid = fork();
 
-    printf("pid: %d\n", pid);
     if (pid == -1) {
         printf("ERROR: fork failed\n");
         return 1;
     }
 
     if (pid == 0) {
-        // Child process: replace with another program
+        // Child process
+        printf("Child process is running...\n");
+
+        // Child only writes to pipes, so close read ends
+        if (close(stdout_pipe[0]) == -1) { printf("ERROR: Child close stdout pipe read end failed\n"); }
+        if (close(stderr_pipe[0]) == -1) { printf("ERROR: Child close stderr pipe read end failed\n"); }
+
+        // Redirect child's stderr and stdout to the pipes
+        if (dup2(stdout_pipe[1], STDOUT_FILENO) == -1) {
+            printf("ERROR: Child dup2 stdout pipe failed\n");
+        }
+        if (dup2(stderr_pipe[1], STDERR_FILENO) == -1) {
+            printf("ERROR: Child dup2 stderr pipe failed\n");
+        }
+
+        // Exec into the user-supplied program
         if (execl(input_file, input_file, (char *)NULL) == -1) {
             printf("ERROR: exec failed\n");
             return 1;
@@ -82,8 +111,19 @@ int unix_run_exercise(int exercise_number, char *input_file) {
         printf("ERROR: This is an unreachable print statement after exec call\n");
         return 1;
     }
-    // Parent process: wait for child to finish
 
+    // Parent process
+    printf("Parent process is running...\n");
+    printf("Spawned child process with pid %d\n", pid);
+
+    // Parent only reads pipe output from child, so close write ends
+    if (close(stdout_pipe[1]) == -1) { printf("ERROR: Parent close stdout pipe write end failed\n"); }
+    if (close(stderr_pipe[1]) == -1) { printf("ERROR: Parent close stderr pipe write end failed\n"); }
+
+    // TODO: Read child process's stdout and stderr from the pipes and send it back to the caller
+    // TODO: Do this in a for loop with sleeps, for simplicity, and break when child returns (or time out if an infinite loop is detected. Child should never take longer than 30 seconds)
+
+    // Wait for child to finish
     int status;
     if (waitpid(pid, &status, 0) == -1) {
         printf("ERROR: waitpid failed\n");
