@@ -243,9 +243,11 @@ int checker_run_exercise(int exercise_number, char *input_file) {
 
     if (pid == 0) {
         // Child process: replace with another program
-        // TODO: Debug this exec call
-        execlp(input_file, input_file, (char *)NULL);
-        printf("ERROR: Should not have got here after an exec call\n");
+        if (execlp(input_file, input_file, (char *)NULL) == -1) {
+            printf("ERROR: exec failed\n");
+            return 1;
+        }
+        printf("ERROR: This is an unreachable print statement after exec call\n");
         return 1;
     }
     // Parent process: wait for child to finish
@@ -302,7 +304,7 @@ int main(int argc, char **argv) {
     // Pass output to the checker
 
     if (checker_run_exercise(current_exercise, args.input_file) != 0) {
-        printf("ERROR: Checker found problems with the program you provided\n");
+        printf("ERROR: Checker encountered problems running the program you provided\n");
         return 1;
     }
 
