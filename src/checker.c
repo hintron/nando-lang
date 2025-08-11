@@ -216,7 +216,7 @@ void checker_delete_solutions() {
 #include <sys/wait.h>
 #include <signal.h>
 
-int checker_run_exercise(int exercise_number, char *input_file) {
+int unix_run_exercise(int exercise_number, char *input_file) {
     if (exercise_number < 0 && input_file == NULL) {
         printf("%s", text_introduction_msg);
         return 0;
@@ -303,7 +303,7 @@ int main(int argc, char **argv) {
     // Run exercise executable and save stdout/stderr to a string.
     // Pass output to the checker
 
-    if (checker_run_exercise(current_exercise, args.input_file) != 0) {
+    if (unix_run_exercise(current_exercise, args.input_file) != 0) {
         printf("ERROR: Checker encountered problems running the program you provided\n");
         return 1;
     }
