@@ -109,14 +109,15 @@ arg_t checker_parse_args(int argc, char **argv) {
     return args;
 }
 
+
 void print_help_msg() {
     printf("%s", usage_msg);
     printf("%s", help_msg);
     printf("\n");
 }
 
+
 // Fill a pre-allocated progress_item_t array with progress data from progress_file
-// g_
 int checker_get_progress_data(
     char *progress_file,
     int total_exercises,
@@ -165,7 +166,6 @@ int checker_get_progress_data(
 
     return rc;
 }
-
 
 
 int checker_check_output(int current_exercise, char *captured_stdout, char* captured_stderr) {
