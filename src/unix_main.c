@@ -24,6 +24,7 @@
 #define FILEPATH_SIZE 1024
 #define INFINITE_LOOP_SECS 5
 
+
 void remove_directory_unix(const char *path) {
     DIR *d = opendir(path);
     if (!d) {
@@ -325,8 +326,7 @@ int main(int argc, char **argv) {
         return 1;
     }
 
-    // Write out the exercise state to the state file
-
+    // TODO: Write out the exercise state to the state file
 
     return 0;
 }
