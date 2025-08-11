@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <stdbool.h>
+#include <string.h>
 
 ////////////////////////////////
 // Text
@@ -163,4 +164,21 @@ int checker_get_progress_data(
     }
 
     return rc;
+}
+
+
+
+int checker_check_output(int current_exercise, char *captured_stdout, char* captured_stderr) {
+    // Compare captured output with expected output
+    if (strcmp(captured_stdout, g_exercises[current_exercise].expected_output) == 0) {
+        printf("Exercise %d completed successfully!\n", current_exercise);
+        return 1;
+    } else {
+        printf("Exercise %d failed:\n", current_exercise);
+        printf("Expected output:\n%s\n", g_exercises[current_exercise].expected_output);
+        printf("Actual output:\n%s\n", captured_stdout);
+        return 0;
+    }
+
+    // TODO: Check stderr
 }

@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <assert.h>
 
 // Platform code
 #include <dirent.h>
@@ -18,6 +19,8 @@
 // #include <fcntl.h>
 // #include <signal.h>
 
+#define OUTPUT_BUFFER_SIZE 1024
+#define FILEPATH_SIZE 1024
 
 void remove_directory_unix(const char *path) {
     DIR *d = opendir(path);
@@ -25,7 +28,7 @@ void remove_directory_unix(const char *path) {
         return;
     }
     struct dirent *entry;
-    char filepath[1024];
+    char filepath[FILEPATH_SIZE];
     while ((entry = readdir(d)) != NULL) {
         if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
             continue;
@@ -49,7 +52,12 @@ void unix_delete_solutions() {
 }
 
 
-int unix_run_exercise(int exercise_number, char *input_file) {
+int unix_run_exercise(
+    int exercise_number,
+    char *input_file,
+    char *output_stdout,
+    char *output_stderr
+) {
     if (exercise_number < 0 && input_file == NULL) {
         printf("%s", text_introduction_msg);
         return 0;
@@ -123,21 +131,94 @@ int unix_run_exercise(int exercise_number, char *input_file) {
     // TODO: Read child process's stdout and stderr from the pipes and send it back to the caller
     // TODO: Do this in a for loop with sleeps, for simplicity, and break when child returns (or time out if an infinite loop is detected. Child should never take longer than 30 seconds)
 
-    // Wait for child to finish
-    int status;
-    if (waitpid(pid, &status, 0) == -1) {
-        printf("ERROR: waitpid failed\n");
-        return 1;
+    int child_status;
+    int infinite_loop_protector = 5;
+    bool child_running = true;
+    bool child_sent_bytes_yet = false;
+    ssize_t total_bytes_read_stdout = 0;
+    ssize_t total_bytes_read_stderr = 0;
+    while (child_running) {
+        ssize_t bytes_read_stdout = read(stdout_pipe[0], &output_stdout[total_bytes_read_stdout], 8);
+        // TODO: When stderr gets no output, read() blocks forever.
+        // TODO: read() needs to become non-blocking to avoid blocking forever
+        // and so we can do infinite loop checking
+        // TODO: For now, hardcode stderr to 0
+        ssize_t bytes_read_stderr = 0;
+        // ssize_t bytes_read_stderr = read(stderr_pipe[0], &output_stderr[total_bytes_read_stderr], 8);
+
+        if (bytes_read_stdout < 0 || bytes_read_stderr < 0) {
+            printf("ERROR: Failed to read from pipe\n");
+            return 1;
+        }
+
+        // printf("bytes_read_stdout: %zd\n", bytes_read_stdout);
+        // printf("bytes_read_stderr: %zd\n", bytes_read_stderr);
+
+        if (bytes_read_stdout > 0) {
+            total_bytes_read_stdout += bytes_read_stdout;
+            if (total_bytes_read_stdout > OUTPUT_BUFFER_SIZE) {
+                printf("\nERROR: Output buffer overflow! Your program exceeded %d bytes of stdout output\n", OUTPUT_BUFFER_SIZE);
+                return 1;
+            }
+            output_stdout[total_bytes_read_stdout] = '\0';
+            printf("%s", &output_stdout[total_bytes_read_stdout - bytes_read_stdout]);
+        }
+
+        if (bytes_read_stderr > 0) {
+            total_bytes_read_stderr += bytes_read_stderr;
+            if (total_bytes_read_stderr > OUTPUT_BUFFER_SIZE) {
+                printf("\nERROR: Output buffer overflow! Your program exceeded %d bytes of stderr output\n", OUTPUT_BUFFER_SIZE);
+                return 1;
+            }
+            output_stderr[total_bytes_read_stderr] = '\0';
+            printf("%s", &output_stderr[total_bytes_read_stderr - bytes_read_stderr]);
+        }
+
+        // Only sleep if the child has already sent back bytes and is stalling for some reason
+        if (child_sent_bytes_yet) {
+            printf("Sleep 1\n");
+            sleep(1);
+            infinite_loop_protector--;
+            if (infinite_loop_protector <= 0) {
+                printf("ERROR: Infinite loop detected\n");
+                return 1;
+            }
+        }
+        if (!child_sent_bytes_yet && (bytes_read_stdout == 0) && (bytes_read_stderr == 0)) {
+            child_sent_bytes_yet = true;
+        }
+
+        // Wait for child to finish
+        switch (waitpid(pid, &child_status, WNOHANG)) {
+            case -1:
+                printf("ERROR: waitpid failed\n");
+                return 1;
+            case 0:
+                // Child is still running
+                break;
+            default:
+                // Child has exited
+                child_running = false;
+                break;
+        }
     }
 
-    if (WIFSIGNALED(status)) {
-        int sig = WTERMSIG(status);
+    assert(total_bytes_read_stderr <= OUTPUT_BUFFER_SIZE);
+    assert(total_bytes_read_stdout <= OUTPUT_BUFFER_SIZE);
+
+    // Null-terminate the strings
+    // TODO: Instead of null terminating, make length-based strings
+    output_stdout[total_bytes_read_stdout] = '\0';
+    output_stderr[total_bytes_read_stderr] = '\0';
+
+    if (WIFSIGNALED(child_status)) {
+        int sig = WTERMSIG(child_status);
         fprintf(stderr, "Child terminated by signal %d (%s)\n", sig, strsignal(sig));
         if (sig == SIGSEGV) {
             fprintf(stderr, "Segmentation fault detected\n");
         }
-    } else if (WIFEXITED(status)) {
-        int code = WEXITSTATUS(status);
+    } else if (WIFEXITED(child_status)) {
+        int code = WEXITSTATUS(child_status);
         printf("Child exited with code %d\n", code);
     }
 
@@ -175,8 +256,18 @@ int main(int argc, char **argv) {
     // Run exercise executable and save stdout/stderr to a string.
     // Pass output to the checker
 
-    if (unix_run_exercise(current_exercise, args.input_file) != 0) {
+    // Add +1 to buffer size to accomodate null terminator, since read() doesn't add one in.
+    // See TLPI 4.4
+    char captured_stdout[OUTPUT_BUFFER_SIZE + 1] = {0};
+    char captured_stderr[OUTPUT_BUFFER_SIZE + 1] = {0};
+
+    if (unix_run_exercise(current_exercise, args.input_file, captured_stdout, captured_stderr) != 0) {
         printf("ERROR: Checker encountered problems running the program you provided\n");
+        return 1;
+    }
+
+    if (checker_check_output(current_exercise, captured_stdout, captured_stderr) != 0) {
+        printf("ERROR: Checker found problems with the output\n");
         return 1;
     }
 
