@@ -60,15 +60,6 @@ int unix_run_exercise(
     char *output_stdout,
     char *output_stderr
 ) {
-    if (exercise_number < 0 && input_file == NULL) {
-        printf("%s", text_introduction_msg);
-        return 0;
-    }
-
-    if (exercise_number < 0) {
-        exercise_number = 0;
-    }
-
     printf("Running exercise %d with input file %s\n", exercise_number, input_file);
 
     // Check that input file exists and is executable
@@ -304,6 +295,25 @@ int main(int argc, char **argv) {
     // See TLPI 4.4
     char captured_stdout[OUTPUT_BUFFER_SIZE + 1] = {0};
     char captured_stderr[OUTPUT_BUFFER_SIZE + 1] = {0};
+
+    // printf("args.input_file: %p\n", args.input_file);
+
+    if (args.input_file == NULL) {
+        switch (current_exercise) {
+            case -1:
+                printf("%s", text_introduction_msg);
+                break;
+            default:
+                printf("TODO: Unhandled intro for exercise %d\n", current_exercise);
+                break;
+        }
+        return 0;
+    }
+
+    // Start at exercise 0
+    if (current_exercise < 0) {
+        current_exercise = 0;
+    }
 
     if (unix_run_exercise(current_exercise, args.input_file, captured_stdout, captured_stderr) != 0) {
         printf("ERROR: Checker encountered problems running the program you provided\n");
