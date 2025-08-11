@@ -295,23 +295,8 @@ int main(int argc, char **argv) {
     if (!args.dev_mode) {
         unix_delete_solutions();
     }
-    // Run exercise executable and save stdout/stderr to a string.
-    // Pass output to the checker
 
-    // Add +1 to buffer size to accomodate null terminator, since read() doesn't add one in.
-    // See TLPI 4.4
-    char captured_stdout[OUTPUT_BUFFER_SIZE + 1] = {0};
-    char captured_stderr[OUTPUT_BUFFER_SIZE + 1] = {0};
-
-    if (args.input_file == NULL) {
-        switch (current_exercise) {
-            case 0:
-                printf("%s", text_introduction_msg);
-                break;
-            default:
-                printf("TODO: Unhandled intro for exercise %d\n", current_exercise);
-                break;
-        }
+    if (checker_print_intro(current_exercise, args.input_file != NULL)) {
         return 0;
     }
 
@@ -320,6 +305,12 @@ int main(int argc, char **argv) {
         current_exercise = 0;
     }
 
+    // Run exercise executable and save stdout/stderr to a string.
+    // Pass output to the checker
+    // Add +1 to buffer size to accomodate null terminator, since read() doesn't add one in.
+    // See TLPI 4.4
+    char captured_stdout[OUTPUT_BUFFER_SIZE + 1] = {0};
+    char captured_stderr[OUTPUT_BUFFER_SIZE + 1] = {0};
     if (unix_run_exercise(current_exercise, args.input_file, captured_stdout, captured_stderr) != 0) {
         printf("ERROR: Checker encountered problems running the program you provided\n");
         return 1;

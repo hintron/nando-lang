@@ -213,3 +213,20 @@ int checker_write_progress_state(progress_item_t *progress_items, int current_ex
     fclose(fp);
     return 1;
 }
+
+
+// If we print the intro, return 1
+int checker_print_intro(int current_exercise, bool has_input_file) {
+    if (has_input_file) {
+        return 0;
+    }
+    switch (current_exercise) {
+        case 0:
+            printf("%s", text_introduction_msg);
+            break;
+        default:
+            printf("TODO: Unhandled intro for exercise %d\n", current_exercise);
+            break;
+    }
+    return 1;
+}
