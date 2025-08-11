@@ -39,9 +39,9 @@ Next, build the checker program with the following command:
 
 ```
 # If on Linux:
-gcc src/checker.c -o checker
+gcc src/main.c -o checker
 # If on macOS
-clang src/checker.c -o checker
+clang src/main.c -o checker
 ```
 
 

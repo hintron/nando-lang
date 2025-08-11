@@ -37,13 +37,13 @@ jobs:
             brew install gcc
             # clang is already installed by default
           fi
-      - name: Compile checker.c with gcc and check output
+      - name: Compile main.c with gcc and check output
         run: |
-          gcc -Werror -Wall -o checker-gcc src/checker.c
+          gcc -Werror -Wall -o checker-gcc src/main.c
 
-      - name: Compile checker.c with clang
+      - name: Compile main.c with clang
         run: |
-          clang -Werror -Wall -o checker-clang src/checker.c
+          clang -Werror -Wall -o checker-clang src/main.c
 
       - name: Run the checker
         run: |
