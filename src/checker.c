@@ -243,7 +243,7 @@ int checker_run_exercise(int exercise_number, char *input_file) {
 
     if (pid == 0) {
         // Child process: replace with another program
-        if (execlp(input_file, input_file, (char *)NULL) == -1) {
+        if (execl(input_file, input_file, (char *)NULL) == -1) {
             printf("ERROR: exec failed\n");
             return 1;
         }
