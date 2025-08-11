@@ -9,9 +9,15 @@ These tasks are meant for beginners who know very basic programming in a
 high-level language. Basic knowledge of functions, variables, strings, loops,
 etc. will be assumed by the exercises, though C-specific syntax will not be.
 
-As a prerequisite, please do the "Learn the Basics" portion
-of the [Learn C](https://www.learn-c.org/) exercises (at least complete up to
-the "Functions" lesson).
+> [!IMPORTANT]
+> As a prerequisite, please do the "Learn the Basics" portion
+> of the [Learn C](https://www.learn-c.org/) exercises (at least complete up to
+> the "Functions" lesson).
+
+> [!NOTE]
+> Avoid the temptation to look at solutions or to use AI - these exercises
+> are designed to help you learn by doing, so try to solve them on your own,
+> and type them out manually.
 
 
 # Quickstart
@@ -54,7 +60,6 @@ Edit your source code files using a coding text editor like
 [VSCode](https://code.visualstudio.com/) or
 [NeoVim](https://github.com/neovim/neovim).
 
-
 Once you have edited the exercise, compile it in your terminal with this
 command:
 
@@ -65,12 +70,14 @@ gcc exercises/<exercise>.c -Wall
 clang exercises/<exercise>.c -Wall
 ```
 
-Replace `<exercise>.c` with the exercise you are working on - use 
-[tab completion](https://en.wikipedia.org/wiki/Command-line_completion) to
-quickly select the exercise.
+> [!TIP]
+> Replace `<exercise>.c` with the exercise you are working on - use 
+> [tab completion](https://en.wikipedia.org/wiki/Command-line_completion) to
+> quickly select the exercise.
 
-(The `-Wall` is optional - it will display warnings that could indicate problems
-in your code, but these warnings do not prevent the code from being compiled.)
+> [!TIP]
+> The `-Wall` is optional - it will display warnings that could indicate problems
+> in your code, but these warnings do not prevent the code from being compiled.
 
 This will compile your code and generate `a.out` if compilation succeeded.
 `a.out` is your compiled program. Each time you compile, `a.out` will get
