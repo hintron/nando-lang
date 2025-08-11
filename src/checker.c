@@ -10,9 +10,9 @@
 ////////////////////////////////
 // Text
 ////////////////////////////////
-#define text_title_00 "Hello, world!\n"
+#define text_title_00 "Hello, world!"
 #define text_expected_output_00 "Expected output 1\n"
-#define text_title_01 "My first segfault\n"
+#define text_title_01 "My first segfault"
 #define text_expected_output_01 "Expected output 2\n"
 
 char *usage_msg = "USAGE: checker [your_program] [-h]\n";
