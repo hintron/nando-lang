@@ -10,10 +10,14 @@
 ////////////////////////////////
 // Text
 ////////////////////////////////
-#define text_title_00 "Hello, world!"
-#define text_expected_output_00 "Expected output 1\n"
-#define text_title_01 "My first segfault"
-#define text_expected_output_01 "Expected output 2\n"
+char text_title_00[] = "Hello, world!";
+char text_expected_output_00[] = "Hello, world!\n";
+char text_title_01[] = "My first segfault";
+char text_expected_output_01[] =
+"x addr: 0x7ffc6e742b20\n"
+"x val: 1337\n"
+"y addr: 0x7ffc6e742b24\n"
+"y val: 3337\n";
 
 char *usage_msg = "USAGE: checker [your_program] [-h]\n";
 char *help_msg =
@@ -56,8 +60,8 @@ typedef struct {
 } progress_item_t;
 
 typedef struct {
-    char name[256];
-    char expected_output[1024];
+    char *name;
+    char *expected_output;
 } exercise_info_t;
 
 ////////////////////////////////
