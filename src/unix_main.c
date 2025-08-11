@@ -279,10 +279,16 @@ int main(int argc, char **argv) {
 
     // Get progress state from the progress file
     progress_item_t progress_items[TOTAL_EXERCISES] = {0};
-    int current_exercise;
+    int current_exercise = 0;
     rc = checker_get_progress_data(".progress.txt", TOTAL_EXERCISES, progress_items, &current_exercise);
     if (rc != 0) {
         return 1;
+    }
+
+    if (current_exercise == -1) {
+        printf("You have completed all exercises!\n");
+        printf("TODO: Print outro\n");
+        return 0;
     }
 
     // Delete the solutions directory if not in dev mode
@@ -297,11 +303,9 @@ int main(int argc, char **argv) {
     char captured_stdout[OUTPUT_BUFFER_SIZE + 1] = {0};
     char captured_stderr[OUTPUT_BUFFER_SIZE + 1] = {0};
 
-    // printf("args.input_file: %p\n", args.input_file);
-
     if (args.input_file == NULL) {
         switch (current_exercise) {
-            case -1:
+            case 0:
                 printf("%s", text_introduction_msg);
                 break;
             default:
@@ -321,12 +325,10 @@ int main(int argc, char **argv) {
         return 1;
     }
 
-    if (checker_check_output(current_exercise, captured_stdout, captured_stderr) != 0) {
-        printf("ERROR: Checker found problems with the output\n");
-        return 1;
+    rc = checker_check_output(current_exercise, captured_stdout, captured_stderr);
+    if (!checker_write_progress_state(progress_items, current_exercise, rc)) {
+        printf("ERROR: Failed to write exercise state to file\n");
     }
-
-    // TODO: Write out the exercise state to the state file
 
     return 0;
 }

@@ -51,8 +51,8 @@ typedef struct {
 
 typedef struct {
     int exercise_number;
-    int status; // 0 = not completed, 1 = completed
-    int fail_count;
+    int status; // 0 = unfinished, 1 = completed
+    int try_count;
 } progress_item_t;
 
 typedef struct {
@@ -118,6 +118,7 @@ void print_help_msg() {
 
 
 // Fill a pre-allocated progress_item_t array with progress data from progress_file
+// Also, set the current exercise. If current exercise is -1, then all exercises are completed
 int checker_get_progress_data(
     char *progress_file,
     int total_exercises,
@@ -127,43 +128,56 @@ int checker_get_progress_data(
     int rc = 0;
     *out_current_exercise = -1;
     FILE *fp = fopen(progress_file, "r+");
-    if (fp) {
-        for (int i = 0; i < total_exercises; i++) {
-            progress_item_t *item = &out_progress_items[i];
-            int rc2 = fscanf(fp, "%d %d %d",
-                &item->exercise_number,
-                &item->status,
-                &item->fail_count
-            );
-            if (item->exercise_number != i) {
-                printf(
-                    "Error: exercise number mismatch (expected %d, got %d)\n",
-                    i,
-                    item->exercise_number
-                );
-            }
-            if (rc2 == 3) {
-                printf("Exercise %d (%s):\n", i, g_exercises[i].name);
-                printf(
-                    "    status: %s; fail count: %d\n",
-                    item->status == 1 ? "COMPLETED" : "UNFINISHED",
-                    item->fail_count
-                );
-                // Record the first unfinished exercise. That's the next one to do
-                if (item->status == 0 && *out_current_exercise == -1) {
-                    *out_current_exercise = i;
-                }
-            } else {
-                printf("Error reading progress file at exercise %d (fscanf() rc = %d)\n", i, rc2);
-                rc = rc2;
-                break;
-            }
-        }
-        fclose(fp);
-    } else {
+    if (!fp) {
         // Progress file not found - starting from scratch
+        return 0;
+    }
+    // Iterate through each line of the progress file.
+    // The progress file is an append-only database, to keep things dead simple
+    while (true) {
+        int exercise_number = -1;
+        int status = -1;
+        // Scan next line of progress file
+        int rc2 = fscanf(fp, "%d %d\n", &exercise_number, &status);
+        if (rc2 == EOF) {
+            // end of file
+            printf("Progress file has been read completely\n");
+            break;
+        } else if (rc2 == 2) {
+            if (exercise_number < 0 || exercise_number >= total_exercises) {
+                printf("ERROR: Invalid exercise number %d in progress file\n", exercise_number);
+                rc = 1;
+                continue;
+            }
+            progress_item_t *item = &out_progress_items[exercise_number];
+            if (status == 0) {
+                if (item->status == 1) {
+                    printf("ERROR: Exercise %d was completed but was later marked as unfinished\n", exercise_number);
+                }
+                item->try_count++;
+            }
+            item->status = status;
+        } else {
+            printf("Error reading progress file at exercise %d (fscanf() rc = %d)\n", exercise_number, rc2);
+            rc = rc2;
+        }
     }
 
+    for (int i = 0; i < total_exercises; i++) {
+        progress_item_t *item = &out_progress_items[i];
+        if (item->status == 0 && *out_current_exercise == -1) {
+            *out_current_exercise = i;
+        }
+        printf("Exercise %d (%s):\n", i, g_exercises[i].name);
+        printf(
+            "    status: %s; try count: %d\n",
+            item->status == 1 ? "COMPLETED" : "UNFINISHED",
+            item->try_count
+        );
+        // Record the first unfinished exercise. That's the next one to do
+    }
+
+    fclose(fp);
     return rc;
 }
 
@@ -174,11 +188,24 @@ int checker_check_output(int current_exercise, char *captured_stdout, char* capt
         printf("Exercise %d completed successfully!\n", current_exercise);
         return 1;
     } else {
-        printf("Exercise %d failed:\n", current_exercise);
+        printf("ERROR: Exercise %d failed:\n", current_exercise);
         printf("Expected output:\n%s\n", g_exercises[current_exercise].expected_output);
         printf("Actual output:\n%s\n", captured_stdout);
         return 0;
     }
 
     // TODO: Check stderr
+}
+
+
+int checker_write_progress_state(progress_item_t *progress_items, int current_exercise, int rc) {
+    // Append the exercise attempt. This file is an append-only database
+    FILE *fp = fopen(".progress", "a");
+    if (!fp) {
+        printf("ERROR: Failed to open progress file for writing\n");
+        return 0;
+    }
+    fprintf(fp, "%d %d\n", current_exercise, rc == -1 ? 0 : 1);
+    fclose(fp);
+    return 1;
 }
