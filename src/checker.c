@@ -130,7 +130,7 @@ int checker_get_progress_data(
     int *out_current_exercise
 ) {
     int rc = 0;
-    *out_current_exercise = -1;
+    *out_current_exercise = 0;
     FILE *fp = fopen(progress_file, "r+");
     if (!fp) {
         // Progress file not found - starting from scratch
