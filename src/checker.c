@@ -19,13 +19,14 @@ char text_expected_output_01[] =
 "y addr: 0x7ffc6e742b24\n"
 "y val: 3337\n";
 
-char *usage_msg = "USAGE: checker [your_program] [-h]\n";
+char *usage_msg = "USAGE: checker [your_program] [-h][--reset]\n";
 char *help_msg =
 "\n"
 "Runs the checker on your program for the next exercise to pass off.\n"
 "\n"
 "[your_program]    The program to check for the current exercise.\n"
 "-h|--help         Print this message.\n"
+"--reset           Delete progress file to reset progress.\n"
 "--dev             Developer mode.\n"
 ;
 char *text_introduction_msg =
@@ -50,6 +51,7 @@ typedef struct {
     char *input_file;  // Input file for the exercise
     bool print_help;
     bool dev_mode;
+    bool reset_progress;
     char *unhandled_arg;
 } arg_t;
 
@@ -78,6 +80,14 @@ exercise_info_t g_exercises[] = {
 // Functions
 ////////////////////////////////
 
+void _delete_progress() {
+    if (remove(".progress") != 0) {
+        printf("ERROR: Failed to delete progress file\n");
+    } else {
+        printf("Successfully deleted progress file\n");
+    }
+}
+
 arg_t checker_parse_args(int argc, char **argv) {
     arg_t args = {0};
     int curr_arg_index = 1;
@@ -99,6 +109,8 @@ arg_t checker_parse_args(int argc, char **argv) {
                 args.print_help = true;
             } else if (double_option && curr_arg[2] == 'd') {
                 args.dev_mode = true;
+            } else if (double_option && curr_arg[2] == 'r') {
+                args.reset_progress = true;
             } else {
                 args.unhandled_arg = curr_arg;
             }
@@ -110,6 +122,12 @@ arg_t checker_parse_args(int argc, char **argv) {
         }
         curr_arg_index++;
     }
+
+    // Handle any generic args here
+    if (args.reset_progress) {
+        _delete_progress();
+    }
+
     return args;
 }
 
@@ -237,4 +255,3 @@ int checker_print_intro(int current_exercise, bool has_input_file) {
 void checker_delete_solutions(void (*rm_dir_fnptr)(const char *)) {
     rm_dir_fnptr(".solutions");
 }
-
