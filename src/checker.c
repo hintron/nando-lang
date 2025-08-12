@@ -30,7 +30,8 @@ char *help_msg =
 "--dev             Developer mode.\n"
 ;
 char *text_introduction_msg =
-"Welcome to nando-lang C exercises!\n"
+"Welcome to nando-lang C exercises!\n";
+char *text_introduction_00 =
 "************************************************************************\n"
 "Try compiling exercises/00-hello-world.c. It will fail to compile.\n"
 "Fix that compiler error and make the exercise print the expected output.\n"
@@ -39,8 +40,7 @@ char *text_introduction_msg =
 "    ./checker <your_program>\n"
 "\n"
 "Good luck! Remember, the goal is to learn and have fun with C programming!\n"
-"************************************************************************\n"
-;
+"************************************************************************\n";
 
 ////////////////////////////////
 // Struct Definitions
@@ -74,7 +74,7 @@ exercise_info_t g_exercises[] = {
     {text_title_00, text_expected_output_00},
     {text_title_01, text_expected_output_01}
 };
-#define TOTAL_EXERCISES sizeof(g_exercises) / sizeof(g_exercises[0])
+#define TOTAL_EXERCISES (sizeof(g_exercises) / sizeof(g_exercises[0]))
 
 ////////////////////////////////
 // Functions
@@ -82,9 +82,9 @@ exercise_info_t g_exercises[] = {
 
 void _delete_progress() {
     if (remove(".progress") != 0) {
-        printf("ERROR: Failed to delete progress file\n");
+        // printf("ERROR: Failed to delete progress file\n");
     } else {
-        printf("Successfully deleted progress file\n");
+        // printf("Successfully deleted progress file\n");
     }
 }
 
@@ -149,7 +149,6 @@ int checker_read_progress_state(
     progress_item_t *out_progress_items,
     int *out_current_exercise
 ) {
-    int rc = 0;
     *out_current_exercise = -1;
     FILE *fp = fopen(progress_file, "r+");
     if (!fp) {
@@ -160,6 +159,7 @@ int checker_read_progress_state(
     // There is a progress file, so it should have some entries
     // Iterate through each line of the progress file.
     // The progress file is an append-only database, to keep things dead simple
+    int rc = 0;
     int line_count = 0;
     while (true) {
         int exercise_number = -1;
@@ -257,8 +257,12 @@ int checker_print_intro(int current_exercise, bool has_input_file) {
         return 0;
     }
     switch (current_exercise) {
-        case 0:
+        case -1:
             printf("%s", text_introduction_msg);
+            printf("%s", text_introduction_00);
+            break;
+        case 0:
+            printf("%s", text_introduction_00);
             break;
         default:
             printf("TODO: Unhandled intro for exercise %d\n", current_exercise);
