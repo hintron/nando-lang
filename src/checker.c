@@ -252,10 +252,7 @@ int checker_write_progress_state(progress_item_t *progress_items, int current_ex
 
 
 // If we print the intro, return 1
-int checker_print_intro(int current_exercise, bool has_input_file) {
-    if (has_input_file) {
-        return 0;
-    }
+int checker_print_intro(int current_exercise) {
     switch (current_exercise) {
         case -1:
             printf("%s", text_introduction_msg);

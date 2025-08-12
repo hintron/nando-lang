@@ -358,7 +358,8 @@ int main(int argc, char **argv) {
         checker_delete_solutions(remove_directory_unix);
     }
 
-    if (checker_print_intro(current_exercise, args.input_file != NULL)) {
+    if (args.input_file == NULL) {
+        checker_print_intro(current_exercise);
         return 0;
     }
 
