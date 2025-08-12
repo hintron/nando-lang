@@ -222,6 +222,7 @@ int unix_run_exercise(
                 printf("ERROR: Infinite loop detected (program did not finish running after %d seconds)\n", INFINITE_LOOP_SECS);
                 return 1;
             }
+            continue;
         }
 
         // Wait for child to finish
