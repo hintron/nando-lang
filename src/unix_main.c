@@ -342,12 +342,12 @@ int main(int argc, char **argv) {
     // Get progress state from the progress file
     progress_item_t progress_items[TOTAL_EXERCISES] = {0};
     int current_exercise = 0;
-    rc = checker_read_progress_state(".progress.txt", TOTAL_EXERCISES, progress_items, &current_exercise);
+    rc = checker_read_progress_state(".progress", TOTAL_EXERCISES, progress_items, &current_exercise);
     if (rc != 0) {
         return 1;
     }
 
-    if (current_exercise == -1) {
+    if (current_exercise >= TOTAL_EXERCISES) {
         printf("You have completed all exercises!\n");
         printf("TODO: Print outro\n");
         return 0;

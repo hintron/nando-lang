@@ -140,7 +140,9 @@ void print_help_msg() {
 
 
 // Fill a pre-allocated progress_item_t array with progress data from progress_file
-// Also, set the current exercise. If current exercise is -1, then all exercises are completed
+// Also, set the current exercise. If current exercise is -1, then no exercises
+// have been attempted. If current exercise is >= total_exercises, then all exercises
+// are completed
 int checker_read_progress_state(
     char *progress_file,
     int total_exercises,
@@ -148,14 +150,17 @@ int checker_read_progress_state(
     int *out_current_exercise
 ) {
     int rc = 0;
-    *out_current_exercise = 0;
+    *out_current_exercise = -1;
     FILE *fp = fopen(progress_file, "r+");
     if (!fp) {
-        // Progress file not found - starting from scratch
+        printf("Progress file not found - starting from scratch\n");
         return 0;
     }
+
+    // There is a progress file, so it should have some entries
     // Iterate through each line of the progress file.
     // The progress file is an append-only database, to keep things dead simple
+    int line_count = 0;
     while (true) {
         int exercise_number = -1;
         int status = -1;
@@ -163,7 +168,7 @@ int checker_read_progress_state(
         int rc2 = fscanf(fp, "%d %d\n", &exercise_number, &status);
         if (rc2 == EOF) {
             // end of file
-            printf("Progress file has been read completely\n");
+            // printf("Progress file has been read completely\n");
             break;
         } else if (rc2 == 2) {
             if (exercise_number < 0 || exercise_number >= total_exercises) {
@@ -183,20 +188,33 @@ int checker_read_progress_state(
             printf("Error reading progress file at exercise %d (fscanf() rc = %d)\n", exercise_number, rc2);
             rc = rc2;
         }
+        line_count++;
     }
 
+    if (line_count == 0) {
+        printf("No progress entries found in .progress file\n");
+        return 0;
+    }
+
+    printf("\n");
     for (int i = 0; i < total_exercises; i++) {
         progress_item_t *item = &out_progress_items[i];
-        if (item->status == 0 && *out_current_exercise == -1) {
+        // Mark the first unfinished exercise as the next one to do
+        if ((*out_current_exercise == -1) && (item->status == 0)) {
             *out_current_exercise = i;
         }
-        printf("Exercise %d (%s):\n", i, g_exercises[i].name);
-        printf(
-            "    status: %s; try count: %d\n",
-            item->status == 1 ? "COMPLETED" : "UNFINISHED",
-            item->try_count
+        printf("Exercise %d: %30s.................%s (%d attempt%s)\n",
+            i,
+            g_exercises[i].name,
+            item->status == 1 ? "COMPLETED" : "unfinished...",
+            item->try_count,
+            item->try_count == 1 ? "" : "s"
         );
-        // Record the first unfinished exercise. That's the next one to do
+    }
+    printf("\n");
+    if (*out_current_exercise == -1) {
+        // All exercises were completed!
+        *out_current_exercise = total_exercises;
     }
 
     fclose(fp);
