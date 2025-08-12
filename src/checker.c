@@ -283,6 +283,7 @@ void checker_delete_solutions(void (*rm_dir_fnptr)(const char *)) {
 // make a backup of the folder and have the user edit in the exercises/ folder.
 void checker_backup_exercises(int (copy_dir_fnptr)(const char *, const char *), bool is_dev_mode) {
     char *new_dir = is_dev_mode ? "my-solutions" : "backup-exercises";
+    printf("Backing up exercise files to directory %s\n", new_dir);
     if (copy_dir_fnptr("exercises", new_dir) != 0) {
         printf("ERROR: Failed to create backup directory %s\n", new_dir);
         return;

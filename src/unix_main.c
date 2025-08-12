@@ -364,6 +364,7 @@ int main(int argc, char **argv) {
 
     // Start at exercise 0
     if (current_exercise < 0) {
+        checker_backup_exercises(unix_copy_directory, args.dev_mode);
         current_exercise = 0;
     }
 
