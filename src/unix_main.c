@@ -23,6 +23,7 @@
 #define OUTPUT_BUFFER_SIZE 1024
 #define FILEPATH_SIZE 1024
 #define INFINITE_LOOP_SECS 5
+#define COPY_BUFFER_SIZE (1 << 14) // 16 KB
 
 
 int unix_copy_file(const char *src, const char *dst) {
@@ -37,11 +38,11 @@ int unix_copy_file(const char *src, const char *dst) {
         printf("ERROR: Cannot open destination file '%s' for copying\n", dst);
         goto cleanup;
     }
-    char buf[4096];
+    char buf[COPY_BUFFER_SIZE];
     size_t n;
     while ((n = fread(buf, 1, sizeof(buf), src_file)) > 0) {
         if (fwrite(buf, 1, n, dst_file) != n) {
-            printf("ERROR: Write error for '%s'\n", dst);
+            printf("ERROR: Error while writing to '%s'\n", dst);
             goto cleanup;
         }
     }
