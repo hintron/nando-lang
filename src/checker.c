@@ -281,13 +281,12 @@ void checker_delete_solutions(void (*rm_dir_fnptr)(const char *)) {
 // Create a copy of the exercises folder as a backup
 // If in dev mode, have solutions be in a separate folder. If not in dev mode,
 // make a backup of the folder and have the user edit in the exercises/ folder.
-void checker_backup_exercises(int (copy_dir_fnptr)(const char *, const char *), bool is_dev_mode) {
-    char *new_dir = is_dev_mode ? "my-solutions" : "backup-exercises";
-    printf("Backing up exercise files to directory %s\n", new_dir);
-    if (copy_dir_fnptr("exercises", new_dir) != 0) {
-        printf("ERROR: Failed to create backup directory %s\n", new_dir);
+void checker_backup_exercises(int (copy_dir_fnptr)(const char *, const char *)) {
+    if (copy_dir_fnptr("exercises", ".original-exercises") != 0) {
+        printf("ERROR: Failed to copy exercises/ to .original-exercises/\n");
         return;
     }
-    char * dir_to_edit = is_dev_mode ? new_dir : "exercises";
-    printf("Please edit exercises in directory %s\n", dir_to_edit);
+    printf("Created backup copy of exercises/ in .original-exercises/\n");
+    printf("Consult those original exercise files if you mess up your exercise files.\n");
+    // For dev work, simply create a copy of exercises and name it "my-solutions" in the terminal
 }
