@@ -25,7 +25,7 @@
 #define INFINITE_LOOP_SECS 5
 
 
-int copy_directory(const char *src, const char *dst) {
+int unix_copy_directory(const char *src, const char *dst) {
     DIR *dir = opendir(src);
     if (!dir) {
         printf("ERROR: Cannot open source directory '%s'\n", src);
@@ -50,7 +50,7 @@ int copy_directory(const char *src, const char *dst) {
             return 1;
         }
         if (S_ISDIR(st.st_mode)) {
-            if (copy_directory(src_path, dst_path) != 0) {
+            if (unix_copy_directory(src_path, dst_path) != 0) {
                 closedir(dir);
                 return 1;
             }
