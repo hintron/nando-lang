@@ -25,16 +25,24 @@
 #define INFINITE_LOOP_SECS 5
 
 
+// Make a copy of a directory, but only if the destination directory doesn't already exist.
 int unix_copy_directory(const char *src, const char *dst) {
     DIR *dir = opendir(src);
     if (!dir) {
         printf("ERROR: Cannot open source directory '%s'\n", src);
         return 1;
     }
-    if (mkdir(dst, 0755) != 0 && errno != EEXIST) {
-        printf("ERROR: Cannot create destination directory '%s'\n", dst);
-        closedir(dir);
-        return 1;
+    errno = 0;
+    if (mkdir(dst, 0755) != 0) {
+        if (errno == EEXIST) {
+            printf("Destination directory '%s' already exists\n", dst);
+            closedir(dir);
+            return 0;
+        } else {
+            printf("ERROR: Cannot create destination directory '%s'\n", dst);
+            closedir(dir);
+            return 1;
+        }
     }
     struct dirent *entry;
     char src_path[FILEPATH_SIZE], dst_path[FILEPATH_SIZE];
