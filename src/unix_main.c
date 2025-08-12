@@ -102,7 +102,7 @@ int unix_run_exercise(
 
     if (pid == 0) {
         // Child process
-        printf("Child process is running...\n");
+        // printf("Child process is running...\n");
 
         // Child only writes to pipes, so close read ends
         if (close(stdout_pipe[0]) == -1) { printf("ERROR: Child close stdout pipe read end failed\n"); }
@@ -127,7 +127,7 @@ int unix_run_exercise(
 
     // Parent process
     printf("Parent process is running...\n");
-    printf("Spawned child process with pid %d\n", pid);
+    printf("Spawned child process with pid %d\n\n\n", pid);
 
     // Parent only reads pipe output from child, so close write ends
     if (close(stdout_pipe[1]) == -1) { printf("ERROR: Parent close stdout pipe write end failed\n"); }
@@ -216,6 +216,7 @@ int unix_run_exercise(
 
         // Only sleep if the child has already sent back bytes and is stalling for some reason
         if ((bytes_read_stdout <= 0) && (bytes_read_stderr <= 0)) {
+            // printf("sleep(1)\n");
             sleep(1);
             infinite_loop_protector--;
             if (infinite_loop_protector <= 0) {
@@ -231,10 +232,11 @@ int unix_run_exercise(
                 printf("ERROR: waitpid failed\n");
                 return 1;
             case 0:
+                // printf("Child is still running...\n");
                 // Child is still running
                 break;
             default:
-                // Child has exited
+                // printf("Child has exited...\n");
                 child_running = false;
                 break;
         }
@@ -256,7 +258,11 @@ int unix_run_exercise(
         }
     } else if (WIFEXITED(child_status)) {
         int code = WEXITSTATUS(child_status);
-        printf("Child exited with code %d\n", code);
+        if (code != 0) {
+            fprintf(stderr, "\n\nChild exited with code %d\n", code);
+        } else {
+            printf("\n\nChild exited successfully\n");
+        }
     }
 
     return 0;
