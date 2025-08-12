@@ -25,6 +25,65 @@
 #define INFINITE_LOOP_SECS 5
 
 
+int copy_directory(const char *src, const char *dst) {
+    DIR *dir = opendir(src);
+    if (!dir) {
+        printf("ERROR: Cannot open source directory '%s'\n", src);
+        return 1;
+    }
+    if (mkdir(dst, 0755) != 0 && errno != EEXIST) {
+        printf("ERROR: Cannot create destination directory '%s'\n", dst);
+        closedir(dir);
+        return 1;
+    }
+    struct dirent *entry;
+    char src_path[FILEPATH_SIZE], dst_path[FILEPATH_SIZE];
+    while ((entry = readdir(dir)) != NULL) {
+        if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
+            continue;
+        snprintf(src_path, sizeof(src_path), "%s/%s", src, entry->d_name);
+        snprintf(dst_path, sizeof(dst_path), "%s/%s", dst, entry->d_name);
+        struct stat st;
+        if (stat(src_path, &st) != 0) {
+            printf("ERROR: Cannot stat '%s'\n", src_path);
+            closedir(dir);
+            return 1;
+        }
+        if (S_ISDIR(st.st_mode)) {
+            if (copy_directory(src_path, dst_path) != 0) {
+                closedir(dir);
+                return 1;
+            }
+        } else {
+            FILE *src_file = fopen(src_path, "rb");
+            FILE *dst_file = fopen(dst_path, "wb");
+            if (!src_file || !dst_file) {
+                printf("ERROR: Cannot copy file '%s'\n", src_path);
+                if (src_file) fclose(src_file);
+                if (dst_file) fclose(dst_file);
+                closedir(dir);
+                return 1;
+            }
+            char buf[4096];
+            size_t n;
+            while ((n = fread(buf, 1, sizeof(buf), src_file)) > 0) {
+                if (fwrite(buf, 1, n, dst_file) != n) {
+                    printf("ERROR: Write error for '%s'\n", dst_path);
+                    fclose(src_file);
+                    fclose(dst_file);
+                    closedir(dir);
+                    return 1;
+                }
+            }
+            fclose(src_file);
+            fclose(dst_file);
+        }
+    }
+    closedir(dir);
+    return 0;
+}
+
+
 void remove_directory_unix(const char *path) {
     DIR *d = opendir(path);
     if (!d) {

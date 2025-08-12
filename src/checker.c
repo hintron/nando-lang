@@ -255,3 +255,16 @@ int checker_print_intro(int current_exercise, bool has_input_file) {
 void checker_delete_solutions(void (*rm_dir_fnptr)(const char *)) {
     rm_dir_fnptr(".solutions");
 }
+
+// Create a copy of the exercises folder as a backup
+// If in dev mode, have solutions be in a separate folder. If not in dev mode,
+// make a backup of the folder and have the user edit in the exercises/ folder.
+void checker_backup_exercises(int (copy_dir_fnptr)(const char *, const char *), bool is_dev_mode) {
+    char *new_dir = is_dev_mode ? "my-solutions" : "backup-exercises";
+    if (copy_dir_fnptr("exercises", new_dir) != 0) {
+        printf("ERROR: Failed to create backup directory %s\n", new_dir);
+        return;
+    }
+    char * dir_to_edit = is_dev_mode ? new_dir : "exercises";
+    printf("Please edit exercises in directory %s\n", dir_to_edit);
+}
