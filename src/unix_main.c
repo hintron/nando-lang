@@ -25,6 +25,39 @@
 #define INFINITE_LOOP_SECS 5
 
 
+int unix_copy_file(const char *src, const char *dst) {
+    int rc = 1;
+    FILE *src_file = fopen(src, "rb");
+    if (!src_file) {
+        printf("ERROR: Cannot open source file '%s' for copying\n", src);
+        goto cleanup;
+    }
+    FILE *dst_file = fopen(dst, "wb");
+    if (!dst_file) {
+        printf("ERROR: Cannot open destination file '%s' for copying\n", dst);
+        goto cleanup;
+    }
+    char buf[4096];
+    size_t n;
+    while ((n = fread(buf, 1, sizeof(buf), src_file)) > 0) {
+        if (fwrite(buf, 1, n, dst_file) != n) {
+            printf("ERROR: Write error for '%s'\n", dst);
+            goto cleanup;
+        }
+    }
+    // Success!
+    rc = 0;
+cleanup:
+    if (src_file) {
+        fclose(src_file);
+    }
+    if (dst_file) {
+        fclose(dst_file);
+    }
+    return rc;
+}
+
+
 // Make a copy of a directory, but only if the destination directory doesn't already exist.
 int unix_copy_directory(const char *src, const char *dst) {
     DIR *dir = opendir(src);
@@ -63,28 +96,10 @@ int unix_copy_directory(const char *src, const char *dst) {
                 return 1;
             }
         } else {
-            FILE *src_file = fopen(src_path, "rb");
-            FILE *dst_file = fopen(dst_path, "wb");
-            if (!src_file || !dst_file) {
-                printf("ERROR: Cannot copy file '%s'\n", src_path);
-                if (src_file) fclose(src_file);
-                if (dst_file) fclose(dst_file);
+            if (unix_copy_file(src_path, dst_path) != 0) {
                 closedir(dir);
                 return 1;
             }
-            char buf[4096];
-            size_t n;
-            while ((n = fread(buf, 1, sizeof(buf), src_file)) > 0) {
-                if (fwrite(buf, 1, n, dst_file) != n) {
-                    printf("ERROR: Write error for '%s'\n", dst_path);
-                    fclose(src_file);
-                    fclose(dst_file);
-                    closedir(dir);
-                    return 1;
-                }
-            }
-            fclose(src_file);
-            fclose(dst_file);
         }
     }
     closedir(dir);
