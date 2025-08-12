@@ -176,8 +176,8 @@ int checker_read_progress_state(
                 if (item->status == 1) {
                     printf("ERROR: Exercise %d was completed but was later marked as unfinished\n", exercise_number);
                 }
-                item->try_count++;
             }
+            item->try_count++;
             item->status = status;
         } else {
             printf("Error reading progress file at exercise %d (fscanf() rc = %d)\n", exercise_number, rc2);
