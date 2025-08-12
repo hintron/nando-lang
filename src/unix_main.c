@@ -50,10 +50,6 @@ void remove_directory_unix(const char *path) {
 }
 
 
-void unix_delete_solutions() {
-    remove_directory_unix(".solutions");
-}
-
 
 int unix_run_exercise(
     int exercise_number,
@@ -300,7 +296,7 @@ int main(int argc, char **argv) {
 
     // Delete the solutions directory if not in dev mode
     if (!args.dev_mode) {
-        unix_delete_solutions();
+        checker_delete_solutions(remove_directory_unix);
     }
 
     if (checker_print_intro(current_exercise, args.input_file != NULL)) {

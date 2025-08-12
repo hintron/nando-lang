@@ -230,3 +230,11 @@ int checker_print_intro(int current_exercise, bool has_input_file) {
     }
     return 1;
 }
+
+
+// Delete the solutions directory, using the given platform-specific rmdir
+// function.
+void checker_delete_solutions(void (*rm_dir_fnptr)(const char *)) {
+    rm_dir_fnptr(".solutions");
+}
+
