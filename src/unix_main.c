@@ -31,11 +31,12 @@ int unix_copy_file(const char *src, const char *dst) {
     FILE *src_file = fopen(src, "rb");
     if (!src_file) {
         printf("ERROR: Cannot open source file '%s' for copying\n", src);
-        goto cleanup;
     }
     FILE *dst_file = fopen(dst, "wb");
     if (!dst_file) {
         printf("ERROR: Cannot open destination file '%s' for copying\n", dst);
+    }
+    if (!src_file || !dst_file) {
         goto cleanup;
     }
     char buf[COPY_BUFFER_SIZE];
