@@ -237,12 +237,12 @@ int checker_check_output(int current_exercise, char *captured_stdout, char* capt
     // Compare captured output with expected output
     if (strcmp(captured_stdout, g_exercises[current_exercise].expected_output) == 0) {
         printf("Exercise %d completed successfully!\n", current_exercise);
-        return 1;
+        return 0;
     } else {
         printf("ERROR: Exercise %d failed:\n", current_exercise);
         printf("Expected output:\n%s\n", g_exercises[current_exercise].expected_output);
         printf("Actual output:\n%s\n", captured_stdout);
-        return 0;
+        return -1;
     }
 
     // TODO: Check stderr
@@ -254,11 +254,12 @@ int checker_write_progress_state(progress_item_t *progress_items, int current_ex
     FILE *fp = fopen(".progress", "a");
     if (!fp) {
         printf("ERROR: Failed to open progress file for writing\n");
-        return 0;
+        return -1;
     }
-    fprintf(fp, "%d %d\n", current_exercise, rc == -1 ? 0 : 1);
+    // Convert rc == 0 (success) into 1 for exercise completed
+    fprintf(fp, "%d %d\n", current_exercise, rc == 0 ? 1 : 0);
     fclose(fp);
-    return 1;
+    return 0;
 }
 
 
