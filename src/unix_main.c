@@ -428,8 +428,10 @@ int main(int argc, char **argv) {
         printf("ERROR: Failed to write exercise state to file\n");
     }
 
-    // Print the introduction for the next exercise
-    checker_print_intro(current_exercise + 1);
+    if (rc == 0) {
+        // Print the introduction for the next exercise
+        checker_print_intro(current_exercise + 1);
+    }
 
-    return 0;
+    return rc;
 }
