@@ -1,10 +1,7 @@
 # Task
 
-Write a C program in `segfault.c` that will dereference (`*`) a null pointer.
+Fix a C program that is dereferencing (`*`) a null pointer.
 
-## Expected Outcome
-
-Segmentation fault
 
 ## Background
 

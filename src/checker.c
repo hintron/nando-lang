@@ -14,10 +14,24 @@ char text_title_00[] = "Hello, world!";
 char text_expected_output_00[] = "Hello, world!\n";
 char text_title_01[] = "My first segfault";
 char text_expected_output_01[] =
-"x addr: 0x7ffc6e742b20\n"
-"x val: 1337\n"
-"y addr: 0x7ffc6e742b24\n"
-"y val: 3337\n";
+"Jill's family:\n"
+"  - Bachelorette: Jill\n"
+"Jill's father's family:\n"
+"  - Father: Freddy\n"
+"  - Mother: Gina\n"
+"    * Child 1: Hank\n"
+"    * Child 2: Ivy\n"
+"    * Child 3: Jill\n"
+"Jill's father's father's family:\n"
+"  - Father: Dave\n"
+"  - Mother: Emily\n"
+"    * Child 1: Freddy\n"
+"    * Child 2: Mary\n"
+"Jill's father's father's father's family:\n"
+"  - Father: Atkins\n"
+"  - Mother: Bernice\n"
+"    * Child 1: Dave\n"
+;
 
 char *usage_msg = "USAGE: checker [your_program] [-h][--reset]\n";
 char *help_msg =
@@ -41,6 +55,23 @@ char *text_introduction_00 =
 "\n"
 "Good luck! Remember, the goal is to learn and have fun with C programming!\n"
 "************************************************************************\n";
+char *text_introduction_01 =
+"************************************************************************\n"
+"Try fixing exercises/01-my-first-segfault.c. It will compile, but hit a segfault when run.\n"
+"\n"
+"Tips:\n"
+" * Pointers are variables that point to other variables in memory.\n"
+" * To declare a pointer to a variable of <type>, do `<type> * <pointer_name>`.\n"
+" * To make <pointer_name> point to another variable, assign `<pointer_name> = &<variable>`\n"
+" * To dereference a pointer (make the pointer give the value it's pointing at), do `*<pointer_name>`\n"
+"************************************************************************\n"
+;
+
+char *outro_msg =
+"************************************************************************\n"
+"           Congratulations! You have completed all exercises!\n"
+"************************************************************************\n"
+;
 
 ////////////////////////////////
 // Struct Definitions
@@ -272,6 +303,9 @@ int checker_print_intro(int current_exercise) {
             break;
         case 0:
             printf("%s", text_introduction_00);
+            break;
+        case 1:
+            printf("%s", text_introduction_01);
             break;
         default:
             printf("TODO: Unhandled intro for exercise %d\n", current_exercise);
