@@ -391,8 +391,8 @@ int main(int argc, char **argv) {
     }
 
     if (current_exercise >= (int)TOTAL_EXERCISES) {
-        printf("You have completed all exercises! (%d >= %ld)\n", current_exercise, TOTAL_EXERCISES);
-        printf("TODO: Print outro\n");
+        printf("You have already completed all exercises! (%d >= %ld)\n", current_exercise, TOTAL_EXERCISES);
+        printf("To restart, use --reset\n");
         return 0;
     }
 

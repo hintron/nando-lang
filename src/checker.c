@@ -308,7 +308,8 @@ int checker_print_intro(int current_exercise) {
             printf("%s", text_introduction_01);
             break;
         default:
-            printf("TODO: Unhandled intro for exercise %d\n", current_exercise);
+            // Print the outro message - all exercises are completed!
+            printf("%s\n", outro_msg);
             break;
     }
     return 1;
