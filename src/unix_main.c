@@ -25,6 +25,8 @@
 #define INFINITE_LOOP_SECS 5
 #define COPY_BUFFER_SIZE (1 << 14) // 16 KB
 
+// Add -DDEBUG to compile command to enable debug prints
+
 
 int unix_copy_file(const char *src, const char *dst) {
     int rc = 1;
@@ -70,7 +72,9 @@ int unix_copy_directory(const char *src, const char *dst) {
     errno = 0;
     if (mkdir(dst, 0755) != 0) {
         if (errno == EEXIST) {
+            #ifdef DEBUG
             printf("Destination directory '%s' already exists\n", dst);
+            #endif
             closedir(dir);
             return 0;
         } else {
@@ -182,7 +186,9 @@ int unix_run_exercise(
 
     if (pid == 0) {
         // Child process
-        // printf("Child process is running...\n");
+        #ifdef DEBUG
+        printf("Child process is running...\n");
+        #endif
 
         // Child only writes to pipes, so close read ends
         if (close(stdout_pipe[0]) == -1) { printf("ERROR: Child close stdout pipe read end failed\n"); }
@@ -206,8 +212,10 @@ int unix_run_exercise(
     }
 
     // Parent process
+    #ifdef DEBUG
     printf("Parent process is running...\n");
     printf("Spawned child process with pid %d\n\n\n", pid);
+    #endif
 
     // Parent only reads pipe output from child, so close write ends
     if (close(stdout_pipe[1]) == -1) { printf("ERROR: Parent close stdout pipe write end failed\n"); }
@@ -271,8 +279,10 @@ int unix_run_exercise(
             }
         }
 
-        // printf("bytes_read_stdout: %zd\n", bytes_read_stdout);
-        // printf("bytes_read_stderr: %zd\n", bytes_read_stderr);
+        #ifdef DEBUG
+        printf("bytes_read_stdout: %zd\n", bytes_read_stdout);
+        printf("bytes_read_stderr: %zd\n", bytes_read_stderr);
+        #endif
 
         if (bytes_read_stdout > 0) {
             total_bytes_read_stdout += bytes_read_stdout;
@@ -296,7 +306,9 @@ int unix_run_exercise(
 
         // Only sleep if the child has already sent back bytes and is stalling for some reason
         if ((bytes_read_stdout <= 0) && (bytes_read_stderr <= 0)) {
-            // printf("sleep(1)\n");
+            #ifdef DEBUG
+            printf("sleep(1)\n");
+            #endif
             sleep(1);
             infinite_loop_protector--;
             if (infinite_loop_protector <= 0) {
@@ -312,11 +324,15 @@ int unix_run_exercise(
                 printf("ERROR: waitpid failed\n");
                 return 1;
             case 0:
-                // printf("Child is still running...\n");
+                #ifdef DEBUG
+                printf("Child is still running...\n");
+                #endif
                 // Child is still running
                 break;
             default:
-                // printf("Child has exited...\n");
+                #ifdef DEBUG
+                printf("Child has exited...\n");
+                #endif
                 child_running = false;
                 break;
         }
@@ -332,16 +348,18 @@ int unix_run_exercise(
 
     if (WIFSIGNALED(child_status)) {
         int sig = WTERMSIG(child_status);
-        fprintf(stderr, "Child terminated by signal %d (%s)\n", sig, strsignal(sig));
+        fprintf(stderr, "Program terminated by signal %d (%s)\n", sig, strsignal(sig));
         if (sig == SIGSEGV) {
-            fprintf(stderr, "Segmentation fault detected\n");
+            fprintf(stderr, "Program terminated via a segmentation fault\n");
         }
     } else if (WIFEXITED(child_status)) {
         int code = WEXITSTATUS(child_status);
         if (code != 0) {
-            fprintf(stderr, "\n\nChild exited with code %d\n", code);
+            fprintf(stderr, "\n\nProgram exited with code %d\n", code);
         } else {
-            printf("\n\nChild exited successfully\n");
+            #ifdef DEBUG
+            printf("\n\nProgram exited successfully\n");
+            #endif
         }
     }
 
@@ -381,6 +399,7 @@ int main(int argc, char **argv) {
     // Delete the solutions directory if not in dev mode
     if (!args.dev_mode) {
         checker_delete_solutions(remove_directory_unix);
+        checker_backup_exercises(unix_copy_directory);
     }
 
     if (args.input_file == NULL) {
@@ -390,10 +409,8 @@ int main(int argc, char **argv) {
 
     // Start at exercise 0
     if (current_exercise < 0) {
-        checker_backup_exercises(unix_copy_directory);
         current_exercise = 0;
     }
-
 
     // Run exercise executable and save stdout/stderr to a string.
     // Pass output to the checker
@@ -410,6 +427,9 @@ int main(int argc, char **argv) {
     if (!checker_write_progress_state(progress_items, current_exercise, rc)) {
         printf("ERROR: Failed to write exercise state to file\n");
     }
+
+    // Print the introduction for the next exercise
+    checker_print_intro(current_exercise + 1);
 
     return 0;
 }

@@ -82,9 +82,13 @@ exercise_info_t g_exercises[] = {
 
 void _delete_progress() {
     if (remove(".progress") != 0) {
-        // printf("ERROR: Failed to delete progress file\n");
+        #ifdef DEBUG
+        printf("ERROR: Failed to delete progress file\n");
+        #endif
     } else {
-        // printf("Successfully deleted progress file\n");
+        #ifdef DEBUG
+        printf("Successfully deleted progress file\n");
+        #endif
     }
 }
 
@@ -152,7 +156,9 @@ int checker_read_progress_state(
     *out_current_exercise = -1;
     FILE *fp = fopen(progress_file, "r+");
     if (!fp) {
+        #ifdef DEBUG
         printf("Progress file not found - starting from scratch\n");
+        #endif
         return 0;
     }
 
@@ -168,7 +174,9 @@ int checker_read_progress_state(
         int rc2 = fscanf(fp, "%d %d\n", &exercise_number, &status);
         if (rc2 == EOF) {
             // end of file
-            // printf("Progress file has been read completely\n");
+            #ifdef DEBUG
+            printf("Progress file has been read completely\n");
+            #endif
             break;
         } else if (rc2 == 2) {
             if (exercise_number < 0 || exercise_number >= total_exercises) {
@@ -192,11 +200,14 @@ int checker_read_progress_state(
     }
 
     if (line_count == 0) {
+        #ifdef DEBUG
         printf("No progress entries found in .progress file\n");
+        #endif
         return 0;
     }
 
-    printf("\n");
+    printf("Progress report:\n");
+    printf("=====================================================================================\n");
     for (int i = 0; i < total_exercises; i++) {
         progress_item_t *item = &out_progress_items[i];
         // Mark the first unfinished exercise as the next one to do
@@ -206,12 +217,12 @@ int checker_read_progress_state(
         printf("Exercise %d: %30s.................%s (%d attempt%s)\n",
             i,
             g_exercises[i].name,
-            item->status == 1 ? "COMPLETED" : "unfinished...",
+            item->status == 1 ? "COMPLETED " : "unfinished",
             item->try_count,
             item->try_count == 1 ? "" : "s"
         );
     }
-    printf("\n");
+    printf("=====================================================================================\n");
     if (*out_current_exercise == -1) {
         // All exercises were completed!
         *out_current_exercise = total_exercises;
@@ -283,7 +294,7 @@ void checker_backup_exercises(int (copy_dir_fnptr)(const char *, const char *)) 
         printf("ERROR: Failed to copy exercises/ to .original-exercises/\n");
         return;
     }
-    printf("Created backup copy of exercises/ in .original-exercises/\n");
-    printf("Consult those original exercise files if you mess up your exercise files.\n");
+    // printf("Created backup copy of exercises/ in .original-exercises/\n");
+    // printf("Consult those original exercise files if you mess up your exercise files.\n");
     // For dev work, simply create a copy of exercises and name it "my-solutions" in the terminal
 }
