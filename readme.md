@@ -22,20 +22,100 @@ etc. will be assumed by the exercises, though C-specific syntax will not be.
 
 # Quickstart
 
+## Make sure C compilers are installed
+
+We will install different C compilers depending on the operating system (OS) you
+use. The main operating systems are macOS (Apple), Windows (Microsoft), and
+Linux.
+
+> [!TIP] The most popular C compilers (like MSVC) are really a combined C and
+> C++ compiler, since C++ is a superset of C. This means that C programs are
+> also valid C++ programs.
+
+
+### macOS
+
+The `clang` C/C++ compiler should automatically be avaialable to use.
+
+
+### Linux (or WSL)
+
+The `gcc` C/C++ compiler should automatically be available to use. If it's not,
+install the "build-essentials" or "gcc" package for you Linux distro.
+
+E.g., for Ubuntu, do:
+```
+sudo apt install build-essentials
+```
+
+`clang` can also be installed on Linux if you prefer `clang`.
+
+
+### Windows
+
+For Windows, we will install the native `msvc` C/C++ compiler.
+
+> [!TIP] If you are on Windows, but want to use a Linux environment, consider
+> using Window's WSL (Windows Subsystem for Linux). This gives you a full Linux
+> installation on Windows, and you can then follow the Linux instructions.
+
+<details><summary>Windows MSVC installation instructions</summary>
+Go to the [Visual Studios downloads page](https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2022)
+and download ["Build Tools for Visual Studio 2022"](https://aka.ms/vs/17/release/vs_BuildTools.exe).
+Once downloaded, run that .exe file.
+
+Click the "Individual components" tab, and search for "MSVC latest" and select
+the component with "x86/64 build tools (Latest)". Also search for "Windows 11"
+and select the Windows 11 SDK version with the highest number.
+
+![alt text](docs/images/vs-install-msvc.png)
+
+Alternatively, under the "Workloads" tab, you can just select "Desktop
+development with C++".
+
+Click `Install`.
+
+> [!INFO] For official documentation on how to install a C compiler on Windows, see
+> [Walkthrough: Compile a C program on the command line](https://learn.microsoft.com/en-us/cpp/build/walkthrough-compile-a-c-program-on-the-command-line?view=msvc-170)
+
+</details>
+
+
 ### Download
 
-Go to https://github.com/hintron/nando-lang/releases and download the source
-code. Extract it to a directory (don't use Git to clone it).
+To download Nando lang, go to https://github.com/hintron/nando-lang/releases and
+download the source code. Extract it to a directory
 
-Next, in a terminal program, go inside that directory:
+> [!NOTE] Don't use Git to clone the repo. We're keeping it simple.
+
+
+### Compile the Checker Program
+
+First, determine the terminal program to use.
+
+* macOS: `terminal`
+* Linux: `konsole`
+  * > [!NOTE]
+    > If using WSL, you will already be using a terminal program.
+* Windows: Developer PowerShell for VS 2022
+  * > [!NOTE]
+    > You must use a "Developer" version of PowerShell, or else `msvc` will
+    > not be available.
+
+
+Next, go inside the nando-lang directory you just downloaded:
 
 ```
 cd <path-to-nando-lang-directory>
 ```
 
-### Compile Checker Program
+> [!TIP]
+> Use [tab completion](https://en.wikipedia.org/wiki/Command-line_completion) to
+> quickly select file paths in the terminal and as a sanity check that the file
+> exists.
 
-Next, build the checker program with the following command:
+Then, build the checker program with the following command, depending on which
+OS you are on:
 
 ```
 # If on Linux:
@@ -73,9 +153,7 @@ clang exercises/<exercise>.c -Wall
 ```
 
 > [!TIP]
-> Replace `<exercise>.c` with the exercise you are working on - use 
-> [tab completion](https://en.wikipedia.org/wiki/Command-line_completion) to
-> quickly select the exercise.
+> Replace `<exercise>.c` with the exercise you are working on
 
 > [!TIP]
 > The `-Wall` is optional - it will display warnings that could indicate problems
