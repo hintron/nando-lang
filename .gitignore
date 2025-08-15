@@ -11,3 +11,4 @@ checker
 backup-exercises/
 my-solutions/
 .original-exercises/
+*.obj

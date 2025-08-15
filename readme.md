@@ -42,6 +42,8 @@ Next, build the checker program with the following command:
 gcc src/main.c -o checker
 # If on macOS
 clang src/main.c -o checker
+# If on Windows
+cl src/main.c
 ```
 
 

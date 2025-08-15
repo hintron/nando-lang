@@ -1,17 +1,19 @@
 // Windows port of the checker program
+#include "checker.c"
 
-int WinMain(int argc, char **argv) {
+int main(int argc, char *argv[]) {
+    printf("Hello from Windows console!\n");
+
     arg_t args = checker_parse_args(argc, argv);
     if (args.print_help) {
         print_help_msg();
         return 0;
     }
+    if (args.unhandled_arg != NULL) {
+        printf("ERROR: Unhandled argument: %s\n", args.unhandled_arg);
+        return 1;
+    }
 
-    // TODO: Get progress state from the progress file
-    checker_parse_progress_state("my_file_bytes");
-    // TODO: Pass progress state into checker_select_exercise()
-    checker_select_exercise();
-    // TODO: Run exercise executable and save stdout/stderr to a string.
-    // Pass output to the checker
-    return checker_run_exercise();
+    return 0;
 }
+
