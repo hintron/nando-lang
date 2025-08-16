@@ -249,7 +249,7 @@ int checker_check_output(int current_exercise, char *captured_stdout, char* capt
 }
 
 
-int checker_write_progress_state(progress_item_t *progress_items, int current_exercise, int rc) {
+int checker_write_progress_state(int current_exercise, int rc) {
     // Append the exercise attempt. This file is an append-only database
     FILE *fp = fopen(".progress", "a");
     if (!fp) {

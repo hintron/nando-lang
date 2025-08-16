@@ -424,7 +424,7 @@ int main(int argc, char **argv) {
     }
 
     rc = checker_check_output(current_exercise, captured_stdout, captured_stderr);
-    if (checker_write_progress_state(progress_items, current_exercise, rc) != 0) {
+    if (checker_write_progress_state(current_exercise, rc) != 0) {
         printf("ERROR: Failed to write exercise state to file\n");
     }
 
