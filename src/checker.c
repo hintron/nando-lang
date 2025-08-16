@@ -233,7 +233,7 @@ int checker_read_progress_state(
 }
 
 
-int checker_check_output(int current_exercise, char *captured_stdout, char* captured_stderr) {
+int checker_check_output(int current_exercise, char *captured_stdout /*, char* captured_stderr*/) {
     // Compare captured output with expected output
     if (strcmp(captured_stdout, g_exercises[current_exercise].expected_output) == 0) {
         printf("Exercise %d completed successfully!\n", current_exercise);
