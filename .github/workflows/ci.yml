@@ -70,6 +70,6 @@ jobs:
       - name: Compile with MSVC
         run: |
           call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
-          cl /nologo /W4 src/main.c
+          cl /nologo /W4 /WX src/main.c
           main.exe -h
         shell: cmd
