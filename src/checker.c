@@ -272,7 +272,7 @@ int checker_check_output(int current_exercise, char *captured_stdout /*, char* c
     } else {
         printf("ERROR: Exercise %d failed:\n", current_exercise);
         printf("Expected output:\n%s\n", g_exercises[current_exercise].expected_output);
-        printf("Actual output:\n%s\n", captured_stdout);
+        // No need to print actual output, since that is already printed
         return -1;
     }
 
