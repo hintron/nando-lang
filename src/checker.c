@@ -95,6 +95,9 @@ typedef struct {
 typedef struct {
     char *name;
     char *expected_output;
+    char *exercise_file;
+    char *solution_file;
+    char *solved_exercise_file;
 } exercise_info_t;
 
 ////////////////////////////////
@@ -102,10 +105,15 @@ typedef struct {
 ////////////////////////////////
 
 exercise_info_t g_exercises[] = {
-    {text_title_00, text_expected_output_00},
-    {text_title_01, text_expected_output_01}
+    {text_title_00, text_expected_output_00, "exercises/00-hello-world.c", ".solutions/00.c", ".solved/00.c"},
+    {text_title_01, text_expected_output_01, "exercises/01-my-first-segfault.c", ".solutions/01.c", ".solved/01.c"}
 };
 #define TOTAL_EXERCISES (sizeof(g_exercises) / sizeof(g_exercises[0]))
+#define SOLUTION_START "//--START--//"
+#define SOLUTION_END   "//--END--//"
+#define REPLACEMENT_TEXT_SIZE 8192
+#define MAX_LINE_SIZE 1024
+
 
 ////////////////////////////////
 // Functions
@@ -336,4 +344,103 @@ void checker_backup_exercises(int (copy_dir_fnptr)(const char *, const char *)) 
     // printf("Created backup copy of exercises/ in .original-exercises/\n");
     // printf("Consult those original exercise files if you mess up your exercise files.\n");
     // For dev work, simply create a copy of exercises and name it "my-solutions" in the terminal
+}
+
+
+// Replace a section of a file and write to a separate output file
+// Returns 0 on success, -1 on error
+int checker_replace_file_section(
+    const char *input_file,
+    const char *output_file,
+    const char *replacement_file
+) {
+    FILE *replacement_fp = fopen(replacement_file, "r");
+    if (!replacement_fp) {
+        printf("ERROR: Failed to open replacement file: %s\n", replacement_file);
+        return -1;
+    }
+
+    // Make a large string big enough for the replacement text
+    char replacement_text[REPLACEMENT_TEXT_SIZE];
+    size_t total_read = 0;
+    while (fgets(replacement_text + total_read, REPLACEMENT_TEXT_SIZE - total_read, replacement_fp)) {
+        total_read = strlen(replacement_text);
+        if (total_read >= sizeof(replacement_text) - 1) {
+            printf("ERROR: Replacement text exceeds buffer size (%u bytes) and was truncated\n", REPLACEMENT_TEXT_SIZE);
+            break;
+        }
+    }
+    fclose(replacement_fp);
+
+    if (total_read == 0) {
+        printf("ERROR: No replacement text given\n");
+        return -1;
+    }
+
+    FILE *input_fp = fopen(input_file, "r");
+    if (!input_fp) {
+        printf("ERROR: Failed to open input file: %s\n", input_file);
+        return -1;
+    }
+
+    FILE *output_fp = fopen(output_file, "w");
+    if (!output_fp) {
+        printf("ERROR: Failed to open output file: %s\n", output_file);
+        fclose(input_fp);
+        return -1;
+    }
+
+    char line[MAX_LINE_SIZE];
+    bool in_replace_section = false;
+    bool found_start = false;
+
+    while (fgets(line, MAX_LINE_SIZE, input_fp)) {
+        if (in_replace_section) {
+            // Lines inside the replace section are skipped
+            if (strstr(line, SOLUTION_END)) {
+                // We are at the end of the replace section
+                // Next line will be written
+                in_replace_section = false;
+                // Keep end marker line
+                fprintf(output_fp, "%s", line);
+            }
+            continue;
+        }
+
+        // Normal line outside the replace section, or start marker line
+        fprintf(output_fp, "%s", line);
+        if (strstr(line, SOLUTION_START)) {
+            // We are at the start of the replace section
+            // Write the replacement text instead of lines in the marked section
+            in_replace_section = true;
+            found_start = true;
+            fprintf(output_fp, "%s", replacement_text);
+        }
+    }
+
+    fclose(input_fp);
+    fclose(output_fp);
+
+    if (!found_start) {
+        printf("WARNING: Start marker '" SOLUTION_START "' was not found in file %s\n", input_file);
+    }
+
+    return 0;
+}
+
+int checker_solve_exercise(int current_exercise) {
+    // Implementation of exercise solving logic goes here
+    return checker_replace_file_section(
+        g_exercises[current_exercise].exercise_file,
+        g_exercises[current_exercise].solved_exercise_file,
+        g_exercises[current_exercise].solution_file
+    );
+}
+
+void checker_solve_all_exercises() {
+    for (int i = 0; i < TOTAL_EXERCISES; i++) {
+        if (checker_solve_exercise(i) != 0) {
+            printf("ERROR: Failed to solve exercise %d\n", i);
+        }
+    }
 }

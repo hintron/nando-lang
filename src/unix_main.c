@@ -397,7 +397,9 @@ int main(int argc, char **argv) {
     }
 
     // Delete the solutions directory if not in dev mode
-    if (!args.dev_mode) {
+    if (args.dev_mode) {
+        checker_solve_all_exercises();
+    } else {
         checker_delete_solutions(remove_directory_unix);
         checker_backup_exercises(unix_copy_directory);
     }
