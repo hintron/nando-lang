@@ -113,7 +113,7 @@ int unix_copy_directory(const char *src, const char *dst) {
 }
 
 
-void remove_directory_unix(const char *path) {
+void unix_remove_directory(const char *path) {
     DIR *d = opendir(path);
     if (!d) {
         return;
@@ -127,7 +127,7 @@ void remove_directory_unix(const char *path) {
         struct stat st;
         if (stat(filepath, &st) == 0) {
             if (S_ISDIR(st.st_mode)) {
-                remove_directory_unix(filepath);
+                unix_remove_directory(filepath);
             } else {
                 remove(filepath);
             }
@@ -400,7 +400,7 @@ int main(int argc, char **argv) {
     if (args.dev_mode) {
         checker_solve_all_exercises();
     } else {
-        checker_delete_solutions(remove_directory_unix);
+        checker_delete_solutions(unix_remove_directory);
         checker_backup_exercises(unix_copy_directory);
     }
 
