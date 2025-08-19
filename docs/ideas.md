@@ -193,3 +193,17 @@ When running the checker with no arguments, it will
 * If the test fails, give encouragement and tell them to read the readme for
   info.
 
+# TODO
+
+* Better organize exercise variables; make exercise-specific data be in separate file
+* Add CI job that will compile and run solutions and prove that they are doable
+* Print updated progress after each completed exercise
+* Implement exercises!
+* Improve readme, hints, and lesson material
+* Windows port of unix_main.c
+* Result types
+* Custom string type with length
+* Add stderr checking
+* Allow user to pass in arguments to exercise file (use execv instead of execl)
+* Have infinite loop check be configurable at run time
+
