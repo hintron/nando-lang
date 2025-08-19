@@ -139,12 +139,10 @@ void unix_remove_directory(const char *path) {
 
 
 int unix_run_exercise(
-    int exercise_number,
     char *input_file,
     char *output_stdout,
     char *output_stderr
 ) {
-    printf("Running exercise %d with input file %s\n", exercise_number, input_file);
     // Check that input file exists and is executable
     struct stat st;
     if (stat(input_file, &st) != 0) {

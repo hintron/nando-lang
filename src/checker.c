@@ -467,7 +467,7 @@ void checker_solve_all_exercises() {
 int checker_main(
     int argc,
     char **argv,
-    int (*run_exercise_fnptr)(int, char *, char *, char *),
+    int (*run_exercise_fnptr)(char *, char *, char *),
     void (*rm_dir_fnptr)(const char *),
     int (*copy_dir_fnptr)(const char *, const char *)
 ) {
@@ -518,7 +518,8 @@ int checker_main(
     // See TLPI 4.4
     char captured_stdout[OUTPUT_BUFFER_SIZE + 1] = {0};
     char captured_stderr[OUTPUT_BUFFER_SIZE + 1] = {0};
-    if (run_exercise_fnptr(current_exercise, args.input_file, captured_stdout, captured_stderr) != 0) {
+    printf("Running exercise %d with input file %s\n", current_exercise, args.input_file);
+    if (run_exercise_fnptr(args.input_file, captured_stdout, captured_stderr) != 0) {
         printf("ERROR: Checker encountered problems running the program you provided\n");
         return 1;
     }
