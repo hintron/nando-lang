@@ -306,7 +306,7 @@ int checker_write_progress_state(int current_exercise, int rc) {
 
 
 // If we print the intro, return 1
-int checker_print_intro(int current_exercise) {
+void checker_print_intro(int current_exercise) {
     switch (current_exercise) {
         case -1:
             printf("%s", text_introduction_msg);
@@ -323,7 +323,6 @@ int checker_print_intro(int current_exercise) {
             printf("%s\n", outro_msg);
             break;
     }
-    return 1;
 }
 
 
