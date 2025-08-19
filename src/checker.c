@@ -205,14 +205,11 @@ int checker_print_progress(progress_item_t *progress_items, int total_exercises)
 }
 
 
-// Fill a pre-allocated progress_item_t array with progress data from progress_file
-// Also, set the current exercise. If current exercise is -1, then no exercises
-// have been attempted. If current exercise is >= total_exercises, then all exercises
-// are completed
+// Print progress data from a progress_file and return the current exercise.
+// If current exercise is -1, then no exercises have been attempted.
+// If current exercise is >= total_exercises, then all exercises are completed.
 int checker_read_progress_state(
     char *progress_file,
-    int total_exercises,
-    progress_item_t *out_progress_items,
     int *out_current_exercise
 ) {
     *out_current_exercise = -1;
@@ -229,6 +226,7 @@ int checker_read_progress_state(
     // The progress file is an append-only database, to keep things dead simple
     int rc = 0;
     int line_count = 0;
+    progress_item_t progress_items[TOTAL_EXERCISES] = {0};
     while (true) {
         int exercise_number = -1;
         int status = -1;
@@ -241,12 +239,12 @@ int checker_read_progress_state(
             #endif
             break;
         } else if (rc2 == 2) {
-            if (exercise_number < 0 || exercise_number >= total_exercises) {
+            if (exercise_number < 0 || exercise_number >= TOTAL_EXERCISES) {
                 printf("ERROR: Invalid exercise number %d in progress file\n", exercise_number);
                 rc = 1;
                 continue;
             }
-            progress_item_t *item = &out_progress_items[exercise_number];
+            progress_item_t *item = &progress_items[exercise_number];
             if (status == 0) {
                 if (item->status == 1) {
                     printf("ERROR: Exercise %d was completed but was later marked as unfinished\n", exercise_number);
@@ -267,10 +265,10 @@ int checker_read_progress_state(
         #endif
         return 0;
     }
-    *out_current_exercise = checker_print_progress(out_progress_items, total_exercises);
+    *out_current_exercise = checker_print_progress(progress_items, TOTAL_EXERCISES);
     if (*out_current_exercise == -1) {
         // All exercises were completed!
-        *out_current_exercise = total_exercises;
+        *out_current_exercise = TOTAL_EXERCISES;
     }
 
     fclose(fp);
