@@ -113,6 +113,7 @@ exercise_info_t g_exercises[] = {
 #define SOLUTION_END   "//--END--//"
 #define REPLACEMENT_TEXT_SIZE 8192
 #define MAX_LINE_SIZE 1024
+#define OUTPUT_BUFFER_SIZE 1024
 
 
 ////////////////////////////////
@@ -449,4 +450,81 @@ void checker_solve_all_exercises() {
             printf("ERROR: Failed to solve exercise %d\n", i);
         }
     }
+}
+
+
+
+////////////////////////////////
+// Checker Main
+////////////////////////////////
+int checker_main(
+    int argc,
+    char **argv,
+    int (*run_exercise_fnptr)(int, char *, char *, char *),
+    void (*rm_dir_fnptr)(const char *),
+    int (*copy_dir_fnptr)(const char *, const char *)
+) {
+    int rc = 0;
+    arg_t args = checker_parse_args(argc, argv);
+    if (args.print_help) {
+        print_help_msg();
+        return 0;
+    }
+    if (args.unhandled_arg != NULL) {
+        printf("ERROR: Unhandled argument: %s\n", args.unhandled_arg);
+        return 1;
+    }
+
+    int current_exercise;
+    rc = checker_read_progress_state(".progress", &current_exercise);
+    if (rc != 0) {
+        return 1;
+    }
+
+    if (current_exercise >= (int)TOTAL_EXERCISES) {
+        printf("You have already completed all exercises! (%d >= %ld)\n", current_exercise, TOTAL_EXERCISES);
+        printf("To restart, use --reset\n");
+        return 0;
+    }
+
+    // Delete the solutions directory if not in dev mode
+    if (args.dev_mode) {
+        checker_solve_all_exercises();
+    } else {
+        checker_delete_solutions(rm_dir_fnptr);
+        checker_backup_exercises(copy_dir_fnptr);
+    }
+
+    if (args.input_file == NULL) {
+        checker_print_intro(current_exercise);
+        return 0;
+    }
+
+    // Start at exercise 0
+    if (current_exercise < 0) {
+        current_exercise = 0;
+    }
+
+    // Run exercise executable and save stdout/stderr to a string.
+    // Pass output to the checker
+    // Add +1 to buffer size to accomodate null terminator, since read() doesn't add one in.
+    // See TLPI 4.4
+    char captured_stdout[OUTPUT_BUFFER_SIZE + 1] = {0};
+    char captured_stderr[OUTPUT_BUFFER_SIZE + 1] = {0};
+    if (run_exercise_fnptr(current_exercise, args.input_file, captured_stdout, captured_stderr) != 0) {
+        printf("ERROR: Checker encountered problems running the program you provided\n");
+        return 1;
+    }
+
+    rc = checker_check_output(current_exercise, captured_stdout/*, captured_stderr*/);
+    if (checker_write_progress_state(current_exercise, rc) != 0) {
+        printf("ERROR: Failed to write exercise state to file\n");
+    }
+
+    if (rc == 0) {
+        // Print the introduction for the next exercise
+        checker_print_intro(current_exercise + 1);
+    }
+
+    return rc;
 }
