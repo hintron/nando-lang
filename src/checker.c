@@ -489,7 +489,7 @@ int checker_main(
     }
 
     if (current_exercise >= (int)TOTAL_EXERCISES) {
-        printf("You have already completed all exercises! (%d >= %ld)\n", current_exercise, TOTAL_EXERCISES);
+        printf("You have already completed all exercises! (%d >= %d)\n", current_exercise, (int)TOTAL_EXERCISES);
         printf("To restart, use --reset\n");
         return 0;
     }
