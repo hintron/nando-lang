@@ -519,10 +519,12 @@ int checker_main(
     char captured_stdout[OUTPUT_BUFFER_SIZE + 1] = {0};
     char captured_stderr[OUTPUT_BUFFER_SIZE + 1] = {0};
     printf("Running exercise %d with input file %s\n", current_exercise, args.input_file);
+    printf("----------------------------------------------------------------\n");
     if (run_executable_fnptr(args.input_file, captured_stdout, captured_stderr) != 0) {
         printf("ERROR: Checker encountered problems running the program you provided\n");
         return 1;
     }
+    printf("----------------------------------------------------------------\n");
 
     rc = checker_check_output(current_exercise, captured_stdout/*, captured_stderr*/);
     if (checker_write_progress_state(current_exercise, rc) != 0) {
