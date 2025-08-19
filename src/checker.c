@@ -181,6 +181,29 @@ void print_help_msg() {
     printf("\n");
 }
 
+// Return the first unfinished exercise
+int checker_print_progress(progress_item_t *progress_items, int total_exercises) {
+    int first_unfinished_exercise = -1;
+    printf("Progress report:\n");
+    printf("=====================================================================================\n");
+    for (int i = 0; i < total_exercises; i++) {
+        progress_item_t *item = &progress_items[i];
+        // Mark the first unfinished exercise as the next one to do
+        if ((first_unfinished_exercise == -1) && (item->status == 0)) {
+            first_unfinished_exercise = i;
+        }
+        printf("Exercise %d: %30s.................%s (%d attempt%s)\n",
+            i,
+            g_exercises[i].name,
+            item->status == 1 ? "COMPLETED " : "unfinished",
+            item->try_count,
+            item->try_count == 1 ? "" : "s"
+        );
+    }
+    printf("=====================================================================================\n");
+    return first_unfinished_exercise;
+}
+
 
 // Fill a pre-allocated progress_item_t array with progress data from progress_file
 // Also, set the current exercise. If current exercise is -1, then no exercises
@@ -244,24 +267,7 @@ int checker_read_progress_state(
         #endif
         return 0;
     }
-
-    printf("Progress report:\n");
-    printf("=====================================================================================\n");
-    for (int i = 0; i < total_exercises; i++) {
-        progress_item_t *item = &out_progress_items[i];
-        // Mark the first unfinished exercise as the next one to do
-        if ((*out_current_exercise == -1) && (item->status == 0)) {
-            *out_current_exercise = i;
-        }
-        printf("Exercise %d: %30s.................%s (%d attempt%s)\n",
-            i,
-            g_exercises[i].name,
-            item->status == 1 ? "COMPLETED " : "unfinished",
-            item->try_count,
-            item->try_count == 1 ? "" : "s"
-        );
-    }
-    printf("=====================================================================================\n");
+    *out_current_exercise = checker_print_progress(out_progress_items, total_exercises);
     if (*out_current_exercise == -1) {
         // All exercises were completed!
         *out_current_exercise = total_exercises;
