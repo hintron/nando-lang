@@ -137,8 +137,7 @@ void unix_remove_directory(const char *path) {
 }
 
 
-
-int unix_run_exercise(
+int unix_run_executable(
     char *input_file,
     char *output_stdout,
     char *output_stderr
@@ -373,7 +372,7 @@ int main(int argc, char **argv) {
     return checker_main(
         argc,
         argv,
-        unix_run_exercise,
+        unix_run_executable,
         unix_remove_directory,
         unix_copy_directory
     );

@@ -460,14 +460,14 @@ void checker_solve_all_exercises() {
 // This is the main entry point for the checker program.
 // argc - The number of command-line arguments
 // argv - The command-line arguments
-// run_exercise_fnptr - Function pointer to run an exercise on the current system
+// run_executable_fnptr - Function pointer to run an executable on the current system
 // rm_dir_fnptr - Function pointer to remove a directory on the current system
 // copy_dir_fnptr - Function pointer to copy a directory on the current system
 ////////////////////////////////
 int checker_main(
     int argc,
     char **argv,
-    int (*run_exercise_fnptr)(char *, char *, char *),
+    int (*run_executable_fnptr)(char *, char *, char *),
     void (*rm_dir_fnptr)(const char *),
     int (*copy_dir_fnptr)(const char *, const char *)
 ) {
@@ -519,7 +519,7 @@ int checker_main(
     char captured_stdout[OUTPUT_BUFFER_SIZE + 1] = {0};
     char captured_stderr[OUTPUT_BUFFER_SIZE + 1] = {0};
     printf("Running exercise %d with input file %s\n", current_exercise, args.input_file);
-    if (run_exercise_fnptr(args.input_file, captured_stdout, captured_stderr) != 0) {
+    if (run_executable_fnptr(args.input_file, captured_stdout, captured_stderr) != 0) {
         printf("ERROR: Checker encountered problems running the program you provided\n");
         return 1;
     }
