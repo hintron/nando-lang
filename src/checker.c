@@ -342,7 +342,7 @@ void checker_delete_solutions(void (*rm_dir_fnptr)(const char *)) {
 // Create a copy of the exercises folder as a backup
 // If in dev mode, have solutions be in a separate folder. If not in dev mode,
 // make a backup of the folder and have the user edit in the exercises/ folder.
-void checker_backup_exercises(int (copy_dir_fnptr)(const char *, const char *)) {
+void checker_backup_exercises(int (*copy_dir_fnptr)(const char *, const char *)) {
     if (copy_dir_fnptr("exercises", ".original-exercises") != 0) {
         printf("ERROR: Failed to copy exercises/ to .original-exercises/\n");
         return;
