@@ -456,6 +456,13 @@ void checker_solve_all_exercises() {
 
 ////////////////////////////////
 // Checker Main
+// 
+// This is the main entry point for the checker program.
+// argc - The number of command-line arguments
+// argv - The command-line arguments
+// run_exercise_fnptr - Function pointer to run an exercise on the current system
+// rm_dir_fnptr - Function pointer to remove a directory on the current system
+// copy_dir_fnptr - Function pointer to copy a directory on the current system
 ////////////////////////////////
 int checker_main(
     int argc,
