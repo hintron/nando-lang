@@ -361,10 +361,10 @@ int checker_replace_file_section(
 
     // Make a large string big enough for the replacement text
     char replacement_text[REPLACEMENT_TEXT_SIZE];
-    size_t total_read = 0;
+    int total_read = 0;
     while (fgets(replacement_text + total_read, REPLACEMENT_TEXT_SIZE - total_read, replacement_fp)) {
-        total_read = strlen(replacement_text);
-        if (total_read >= sizeof(replacement_text) - 1) {
+        total_read = (int)strlen(replacement_text);
+        if (total_read >= REPLACEMENT_TEXT_SIZE - 1) {
             printf("ERROR: Replacement text exceeds buffer size (%u bytes) and was truncated\n", REPLACEMENT_TEXT_SIZE);
             break;
         }
