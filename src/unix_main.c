@@ -146,7 +146,6 @@ int unix_run_exercise(
     char *output_stderr
 ) {
     printf("Running exercise %d with input file %s\n", exercise_number, input_file);
-
     // Check that input file exists and is executable
     struct stat st;
     if (stat(input_file, &st) != 0) {
@@ -157,6 +156,7 @@ int unix_run_exercise(
         printf("ERROR: Input file '%s' is not executable\n", input_file);
         return 1;
     }
+    printf("----------------------------------------------------------------\n");
 
     // Before fork, create a pipe in order to capture child process's stdout
     // Item [1] is always the input into the pipe (write end), while [0] is the output (read end)
@@ -345,6 +345,8 @@ int unix_run_exercise(
     // TODO: Instead of null terminating, make length-based strings
     output_stdout[total_bytes_read_stdout] = '\0';
     output_stderr[total_bytes_read_stderr] = '\0';
+
+    printf("----------------------------------------------------------------\n");
 
     if (WIFSIGNALED(child_status)) {
         int sig = WTERMSIG(child_status);

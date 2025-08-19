@@ -283,7 +283,10 @@ int checker_check_output(int current_exercise, char *captured_stdout /*, char* c
         return 0;
     } else {
         printf("ERROR: Exercise %d failed:\n", current_exercise);
-        printf("Expected output:\n%s\n", g_exercises[current_exercise].expected_output);
+        printf("Expected output:\n");
+        printf("----------------------------------------------------------------\n");
+        printf("%s", g_exercises[current_exercise].expected_output);
+        printf("----------------------------------------------------------------\n");
         // No need to print actual output, since that is already printed
         if (current_exercise > 0 && strcmp(captured_stdout, g_exercises[current_exercise - 1].expected_output) == 0) {
             printf("HINT: It appears that you reused the program from the last exercise (exercise %d)...\n", current_exercise - 1);
