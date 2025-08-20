@@ -14,10 +14,9 @@ etc. will be assumed by the exercises, though C-specific syntax will not be.
 > of the [Learn C](https://www.learn-c.org/) exercises (at least complete up to
 > the "Functions" lesson).
 
-> [!NOTE]
-> Avoid the temptation to look at solutions or to use AI - these exercises
-> are designed to help you learn by doing, so try to solve them on your own,
-> and type them out manually.
+Avoid the temptation to look at solutions or to use AI - these exercises
+are designed to help you learn by doing, so try to solve them on your own,
+and type them out manually.
 
 
 # Quickstart
@@ -28,7 +27,8 @@ We will install different C compilers depending on the operating system (OS) you
 use. The main operating systems are macOS (Apple), Windows (Microsoft), and
 Linux.
 
-> [!TIP] The most popular C compilers (like MSVC) are really a combined C and
+> [!TIP]
+> The most popular C compilers (like MSVC) are really a combined C and
 > C++ compiler, since C++ is a superset of C. This means that C programs are
 > also valid C++ programs.
 
@@ -53,32 +53,28 @@ sudo apt install build-essentials
 
 ### Windows
 
-For Windows, we will install the native `msvc` C/C++ compiler.
-
-> [!TIP] If you are on Windows, but want to use a Linux environment, consider
+> [!TIP]
+> If you are on Windows, but want to use a Linux environment, consider
 > using Window's WSL (Windows Subsystem for Linux). This gives you a full Linux
 > installation on Windows, and you can then follow the Linux instructions.
 
-<details><summary>Windows MSVC installation instructions</summary>
-Go to the [Visual Studios downloads page](https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2022)
-and download ["Build Tools for Visual Studio 2022"](https://aka.ms/vs/17/release/vs_BuildTools.exe).
-Once downloaded, run that .exe file.
+For Windows, we will install the native `msvc` C/C++ compiler.
 
-Click the "Individual components" tab, and search for "MSVC latest" and select
-the component with "x86/64 build tools (Latest)". Also search for "Windows 11"
-and select the Windows 11 SDK version with the highest number.
+* Go to the [Visual Studios downloads page](https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2022)
+* Download ["Build Tools for Visual Studio 2022"](https://aka.ms/vs/17/release/vs_BuildTools.exe)
+* Run `vs_BuildTools.exe`
+* Under the "Workloads" tab, select "Desktop development with C++"
+  ![alt text](docs/images/vs-install.png)
+* Click `Install`
+* Search for `Developer PowerShell for VS 2022` and run it
+* In PowerShell, change the directory to where you downloaded Nando Lang
+  ```
+  cd <path-to-nando-lang>
+  ```
 
-![alt text](docs/images/vs-install-msvc.png)
-
-Alternatively, under the "Workloads" tab, you can just select "Desktop
-development with C++".
-
-Click `Install`.
-
-> [!INFO] For official documentation on how to install a C compiler on Windows, see
+> [!NOTE]
+> For official documentation on how to install a C compiler on Windows, see
 > [Walkthrough: Compile a C program on the command line](https://learn.microsoft.com/en-us/cpp/build/walkthrough-compile-a-c-program-on-the-command-line?view=msvc-170)
-
-</details>
 
 
 ### Download
@@ -86,7 +82,7 @@ Click `Install`.
 To download Nando lang, go to https://github.com/hintron/nando-lang/releases and
 download the source code. Extract it to a directory
 
-> [!NOTE] Don't use Git to clone the repo. We're keeping it simple.
+(Don't use Git to clone the repo. We're keeping it simple.)
 
 
 ### Compile the Checker Program
@@ -95,12 +91,10 @@ First, determine the terminal program to use.
 
 * macOS: `terminal`
 * Linux: `konsole`
-  * > [!NOTE]
-    > If using WSL, you will already be using a terminal program.
+  * (If using WSL, you will already be using a terminal program.)
 * Windows: Developer PowerShell for VS 2022
-  * > [!NOTE]
-    > You must use a "Developer" version of PowerShell, or else `msvc` will
-    > not be available.
+  * (You must use a "Developer" version of PowerShell, or else `msvc` will
+    not be available.)
 
 
 Next, go inside the nando-lang directory you just downloaded:
@@ -119,9 +113,9 @@ OS you are on:
 
 ```
 # If on Linux:
-gcc src/main.c -o checker
+gcc src/main.c -o main
 # If on macOS
-clang src/main.c -o checker
+clang src/main.c -o main
 # If on Windows
 cl src/main.c
 ```
@@ -130,7 +124,7 @@ cl src/main.c
 Next, run the checker with no arguments:
 
 ```
-./checker
+./main
 ```
 
 This will display an introductory blurb with your first instructions. These
@@ -150,13 +144,14 @@ command:
 gcc exercises/<exercise>.c -Wall
 # macOS
 clang exercises/<exercise>.c -Wall
+# Windows
+cl exercises/<exercise>.c /W4 /Fea.out.exe
 ```
 
-> [!TIP]
-> Replace `<exercise>.c` with the exercise you are working on
+Replace `<exercise>.c` with the exercise you are working on.
 
 > [!TIP]
-> The `-Wall` is optional - it will display warnings that could indicate problems
+> The `-Wall`/`/W4` are optional - they will display warnings that could indicate problems
 > in your code, but these warnings do not prevent the code from being compiled.
 
 This will compile your code and generate `a.out` if compilation succeeded.
@@ -173,7 +168,7 @@ When you are satisfied that it does what you want, give it to the checker to run
 and see if you pass the exercise!:
 
 ```
-./checker a.out
+./main a.out
 ```
 
 If you pass, the checker will tell you the next exercise to work on.
