@@ -213,11 +213,6 @@ int win_run_executable(
     const DWORD MAX_TIMEOUT_COUNT = INFINITE_LOOP_SECS * 10; // 10 checks per second
 
     while (timeout_count < MAX_TIMEOUT_COUNT) {
-        // Check if process is still running
-        DWORD exit_code;
-        if (GetExitCodeProcess(pi.hProcess, &exit_code) && exit_code != STILL_ACTIVE) {
-            break;
-        }
 
         // Try to read from stdout
         DWORD bytes_available = 0;
@@ -253,6 +248,12 @@ int win_run_executable(
                 }
             }
             timeout_count = 0; // Reset timeout since we got data
+        }
+
+        // Check if process is still running
+        DWORD exit_code;
+        if (GetExitCodeProcess(pi.hProcess, &exit_code) && exit_code != STILL_ACTIVE) {
+            break;
         }
 
         // Sleep and increment timeout counter
