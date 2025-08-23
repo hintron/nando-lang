@@ -211,12 +211,16 @@ int win_run_executable(
     DWORD total_bytes_read_stderr = 0;
     DWORD timeout_count = 0;
     const DWORD MAX_TIMEOUT_COUNT = INFINITE_LOOP_SECS * 10; // 10 checks per second
+    // printf("MAX_TIMEOUT_COUNT: %d\n", MAX_TIMEOUT_COUNT);
 
     while (timeout_count < MAX_TIMEOUT_COUNT) {
+        // printf("Start of loop; timeout_count: %d\n", timeout_count);
 
         // Try to read from stdout
         DWORD bytes_available = 0;
         if (PeekNamedPipe(stdout_read, NULL, 0, NULL, &bytes_available, NULL) && bytes_available > 0) {
+            // printf("Peek stdout\n");
+
             DWORD bytes_read;
             DWORD bytes_to_read = min(bytes_available, OUTPUT_BUFFER_SIZE - total_bytes_read_stdout - 1);
             if (bytes_to_read > 0 && ReadFile(stdout_read, &output_stdout[total_bytes_read_stdout], bytes_to_read, &bytes_read, NULL)) {
@@ -235,6 +239,8 @@ int win_run_executable(
         // Try to read from stderr
         bytes_available = 0;
         if (PeekNamedPipe(stderr_read, NULL, 0, NULL, &bytes_available, NULL) && bytes_available > 0) {
+            // printf("Peek stderr\n");
+
             DWORD bytes_read;
             DWORD bytes_to_read = min(bytes_available, OUTPUT_BUFFER_SIZE - total_bytes_read_stderr - 1);
             if (bytes_to_read > 0 && ReadFile(stderr_read, &output_stderr[total_bytes_read_stderr], bytes_to_read, &bytes_read, NULL)) {
@@ -253,13 +259,17 @@ int win_run_executable(
         // Check if process is still running
         DWORD exit_code;
         if (GetExitCodeProcess(pi.hProcess, &exit_code) && exit_code != STILL_ACTIVE) {
+            // printf("exit_code: %d\n", exit_code);
             break;
         }
 
         // Sleep and increment timeout counter
         Sleep(100); // 100ms
         timeout_count++;
+        // printf("sleep; timeout_count++\n");
     }
+
+    // printf("Check for timeout\n");
 
     // Check for timeout
     DWORD final_exit_code;
@@ -268,6 +278,8 @@ int win_run_executable(
         TerminateProcess(pi.hProcess, 1);
         WaitForSingleObject(pi.hProcess, INFINITE);
     } else {
+        // printf("Wait\n");
+
         // Wait for process to complete
         WaitForSingleObject(pi.hProcess, INFINITE);
         GetExitCodeProcess(pi.hProcess, &final_exit_code);
@@ -290,6 +302,7 @@ int win_run_executable(
     // Null-terminate the output strings
     output_stdout[total_bytes_read_stdout] = '\0';
     output_stderr[total_bytes_read_stderr] = '\0';
+    // printf("cleanup\n");
 
     return 0;
 }
