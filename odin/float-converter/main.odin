@@ -29,7 +29,7 @@ main :: proc() {
 ////////////////////////////////////////////////////////////////////////////////
 // Float and Integer Bit Manipulation Functions
 ////////////////////////////////////////////////////////////////////////////////
-BIT_COUNT :: 32
+MAX_BIT_COUNT :: 1024
 
 FloatState :: struct {
     bits: u32,
@@ -303,21 +303,40 @@ run_graphics :: proc() {
     start_x: i32 = 80
     spacing: i32 = 28
     size: i32 = 22
+    current_bit_count: i32 = 32
+    container_counts :: 2
+    int_index := 0
+    float_index := 1
 
-    bit_rects: [BIT_COUNT]BitRect
+    bit_rects: [MAX_BIT_COUNT * container_counts]BitRect
 
-    for i in 0 ..< BIT_COUNT {
-        x := start_x + (BIT_COUNT - 1 - i32(i)) * spacing
-        rect := rl.Rectangle{f32(x), f32(top_y), f32(size), f32(size)}
-        bit_rects[i] = BitRect{rect, u32(i)}
+    for contianer_index in 0 ..< container_counts {
+         for bit_index in 0 ..< MAX_BIT_COUNT {
+            // // Skip currently-unused bits
+            // if bit_index >= current_bit_count {
+            //     continue
+            // }
+            idx := (contianer_index * MAX_BIT_COUNT) + bit_index
+            x := start_x + (MAX_BIT_COUNT - 1 - i32(bit_index)) * spacing
+            y := contianer_index == int_index ? top_y : bottom_y
+            bit_rects[idx] = BitRect {
+                rect = rl.Rectangle {
+                    f32(x),
+                    f32(y),
+                    f32(size),
+                    f32(size),
+                },
+                index = u32(bit_index),
+            }
+        }
     }
 
     // Input boxes placed below the bit display area to avoid overlap
     int_box := InputBox {
-        rect = rl.Rectangle{130, 308, 240, 28},
+        rect = rl.Rectangle{130, 308, 240, 28}
     }
     float_box := InputBox {
-        rect = rl.Rectangle{470, 308, 240, 28},
+        rect = rl.Rectangle{470, 308, 240, 28}
     }
 
     hex_buf: [16]u8
@@ -337,17 +356,17 @@ run_graphics :: proc() {
 
             // Only process bit rects when not clicking an input box
             if !int_clicked && !float_clicked {
-                for r in bit_rects {
-                    if rl.CheckCollisionPointRec(mouse, r.rect) {
-                        state_set_bit(&state, r.index)
-                    }
-                }
-
-                for r in bit_rects {
-                    br := r.rect
-                    br.y = f32(bottom_y)
-                    if rl.CheckCollisionPointRec(mouse, br) {
-                        state_set_bit(&state, r.index)
+                for container_index in 0 ..< container_counts {
+                    for bit_index in 0 ..< MAX_BIT_COUNT {
+                        // Skip currently-unused bits
+                        if bit_index >= int(current_bit_count) {
+                            continue
+                        }
+                        idx := (container_index * MAX_BIT_COUNT) + bit_index
+                        // rect.y = f32(bottom_y)
+                        if rl.CheckCollisionPointRec(mouse, bit_rects[idx].rect) {
+                            state_set_bit(&state, bit_rects[idx].index)
+                        }
                     }
                 }
             }
@@ -356,8 +375,8 @@ run_graphics :: proc() {
         // Only process key map when no input box is active
         if !int_box.active && !float_box.active {
             for i in 0 ..< len(key_map) {
-                if i < BIT_COUNT && rl.IsKeyPressed(key_map[i]) {
-                    state_toggle_bit(&state, u32(BIT_COUNT - 1 - i))
+                if i < MAX_BIT_COUNT && rl.IsKeyPressed(key_map[i]) {
+                    state_toggle_bit(&state, u32(MAX_BIT_COUNT - 1 - i))
                 }
             }
         }
@@ -473,56 +492,58 @@ run_graphics :: proc() {
             rl.BLACK,
         )
 
-        for r in bit_rects {
-            bit := (state.bits >> r.index) & 1
+        for i in 0 ..< current_bit_count {
+            for r in bit_rects {
+                bit := (state.bits >> r.index) & 1
 
-            color := rl.LIGHTGRAY
-            if bit == 1 {
-                color = rl.GREEN
+                color := rl.LIGHTGRAY
+                if bit == 1 {
+                    color = rl.GREEN
+                }
+
+                if r.index == 31 {
+                    color = rl.ORANGE
+                } else if r.index >= 23 && r.index <= 30 {
+                    color = rl.SKYBLUE
+                } else if r.index <= 22 {
+                    color = rl.PURPLE
+                }
+
+                // MGH TODO: Dim unset bits in coloured regions
+
+                rl.DrawRectangleRec(r.rect, color)
+                rl.DrawRectangleLinesEx(r.rect, 1, rl.BLACK)
+
+                bottom := r.rect
+                bottom.y = f32(bottom_y)
+
+                rl.DrawRectangleRec(bottom, color)
+                rl.DrawRectangleLinesEx(bottom, 1, rl.BLACK)
+
+                x1 := r.rect.x + r.rect.width / 2
+                y1 := r.rect.y + r.rect.height
+                x2 := bottom.x + bottom.width / 2
+                y2 := bottom.y
+
+                rl.DrawLine(i32(x1), i32(y1), i32(x2), i32(y2), rl.GRAY)
+
+                txt: cstring
+                if bit == 1 {
+                    txt = "1"
+                } else {
+                    txt = "0"
+                }
+
+                rl.DrawText(txt, i32(r.rect.x + 5), i32(r.rect.y + 2), 18, rl.BLACK)
+                rl.DrawText(txt, i32(bottom.x + 5), i32(bottom.y + 2), 18, rl.BLACK)
             }
-
-            if r.index == 31 {
-                color = rl.ORANGE
-            } else if r.index >= 23 && r.index <= 30 {
-                color = rl.SKYBLUE
-            } else if r.index <= 22 {
-                color = rl.PURPLE
-            }
-
-            // MGH TODO: Dim unset bits in coloured regions
-
-            rl.DrawRectangleRec(r.rect, color)
-            rl.DrawRectangleLinesEx(r.rect, 1, rl.BLACK)
-
-            bottom := r.rect
-            bottom.y = f32(bottom_y)
-
-            rl.DrawRectangleRec(bottom, color)
-            rl.DrawRectangleLinesEx(bottom, 1, rl.BLACK)
-
-            x1 := r.rect.x + r.rect.width / 2
-            y1 := r.rect.y + r.rect.height
-            x2 := bottom.x + bottom.width / 2
-            y2 := bottom.y
-
-            rl.DrawLine(i32(x1), i32(y1), i32(x2), i32(y2), rl.GRAY)
-
-            txt: cstring
-            if bit == 1 {
-                txt = "1"
-            } else {
-                txt = "0"
-            }
-
-            rl.DrawText(txt, i32(r.rect.x + 5), i32(r.rect.y + 2), 18, rl.BLACK)
-            rl.DrawText(txt, i32(bottom.x + 5), i32(bottom.y + 2), 18, rl.BLACK)
         }
 
-        rl.DrawText("sign", start_x + (BIT_COUNT - 1 - 31) * spacing, bottom_y + 35, 14, rl.ORANGE)
-        rl.DrawText("exp", start_x + (BIT_COUNT - 1 - 30) * spacing, bottom_y + 35, 14, rl.SKYBLUE)
+        rl.DrawText("sign", start_x + (MAX_BIT_COUNT - 1 - 31) * spacing, bottom_y + 35, 14, rl.ORANGE)
+        rl.DrawText("exp", start_x + (MAX_BIT_COUNT - 1 - 30) * spacing, bottom_y + 35, 14, rl.SKYBLUE)
         rl.DrawText(
             "mantissa",
-            start_x + (BIT_COUNT - 1 - 22) * spacing,
+            start_x + (MAX_BIT_COUNT - 1 - 22) * spacing,
             bottom_y + 35,
             14,
             rl.PURPLE,
