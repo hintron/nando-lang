@@ -1,5 +1,7 @@
 package main
 
+import "core:fmt"
+import "core:strconv"
 import rl "vendor:raylib"
 
 SCREEN_WIDTH :: 1200
@@ -11,6 +13,45 @@ BitRect :: struct {
     index: u32,
 }
 
+InputBox :: struct {
+    rect: rl.Rectangle,
+    buf: [64]u8,
+    len: int,
+    active: bool,
+}
+
+key_map := []rl.KeyboardKey {
+    .ONE,
+    .TWO,
+    .THREE,
+    .FOUR,
+    .FIVE,
+    .SIX,
+    .SEVEN,
+    .EIGHT,
+    .NINE,
+    .ZERO,
+    .Q,
+    .W,
+    .E,
+    .R,
+    .T,
+    .Y,
+    .U,
+    .I,
+    .O,
+    .P,
+    .A,
+    .S,
+    .D,
+    .F,
+    .G,
+    .H,
+    .J,
+    .K,
+    .L,
+}
+
 main :: proc() {
     rl.InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Bit Visualizer")
     defer rl.CloseWindow()
@@ -18,6 +59,7 @@ main :: proc() {
     rl.SetTargetFPS(60)
 
     bits: u32 = 0
+    prev_bits: u32 = 0xFFFFFFFF // force initial buffer fill
 
     top_y: i32 = 120
     bottom_y: i32 = 240
@@ -33,75 +75,161 @@ main :: proc() {
         bit_rects[i] = BitRect{rect, u32(i)}
     }
 
-    for !rl.WindowShouldClose() {
+    // Input boxes placed below the bit display area to avoid overlap
+    int_box := InputBox {
+        rect = rl.Rectangle{130, 308, 240, 28},
+    }
+    float_box := InputBox {
+        rect = rl.Rectangle{470, 308, 240, 28},
+    }
 
+    ////////////////////////////////////////////////////////////////////////////
+    // Main loop
+    ////////////////////////////////////////////////////////////////////////////
+    for !rl.WindowShouldClose() {
+        ////////////////////////////////////////////////////////////////////////
+        // Update Logic
+        ////////////////////////////////////////////////////////////////////////
         mouse := rl.GetMousePosition()
 
+        // Detect clicks on input boxes first
         if rl.IsMouseButtonPressed(.LEFT) {
-            for r in bit_rects {
-                if rl.CheckCollisionPointRec(mouse, r.rect) {
-                    bits |= 1 << r.index
-                }
-            }
+            int_clicked := rl.CheckCollisionPointRec(mouse, int_box.rect)
+            float_clicked := rl.CheckCollisionPointRec(mouse, float_box.rect)
+            int_box.active = int_clicked
+            float_box.active = float_clicked
 
-            for r in bit_rects {
-                br := r.rect
-                br.y = f32(bottom_y)
-                if rl.CheckCollisionPointRec(mouse, br) {
-                    bits |= 1 << r.index
+            // Only process bit rects when not clicking an input box
+            if !int_clicked && !float_clicked {
+                for r in bit_rects {
+                    if rl.CheckCollisionPointRec(mouse, r.rect) {
+                        bits |= 1 << r.index
+                    }
+                }
+
+                for r in bit_rects {
+                    br := r.rect
+                    br.y = f32(bottom_y)
+                    if rl.CheckCollisionPointRec(mouse, br) {
+                        bits |= 1 << r.index
+                    }
                 }
             }
         }
 
-        key_map := []rl.KeyboardKey {
-            .ONE,
-            .TWO,
-            .THREE,
-            .FOUR,
-            .FIVE,
-            .SIX,
-            .SEVEN,
-            .EIGHT,
-            .NINE,
-            .ZERO,
-            .Q,
-            .W,
-            .E,
-            .R,
-            .T,
-            .Y,
-            .U,
-            .I,
-            .O,
-            .P,
-            .A,
-            .S,
-            .D,
-            .F,
-            .G,
-            .H,
-            .J,
-            .K,
-            .L,
+        // Only process key map when no input box is active
+        if !int_box.active && !float_box.active {
+            for i in 0 ..< len(key_map) {
+                if i < BIT_COUNT && rl.IsKeyPressed(key_map[i]) {
+                    bits |= 1 << (BIT_COUNT - 1 - u32(i))
+                }
+            }
         }
 
-        for i in 0 ..< len(key_map) {
-            if i < BIT_COUNT && rl.IsKeyPressed(key_map[i]) {
-                bits |= 1 << (BIT_COUNT - 1 - u32(i))
+        // Handle text input for the integer box
+        if int_box.active {
+            c := rl.GetCharPressed()
+            for c != 0 {
+                if (c >= '0' && c <= '9') || c == '-' {
+                    if int_box.len < len(int_box.buf) - 1 {
+                        int_box.buf[int_box.len] = u8(c)
+                        int_box.len += 1
+                    }
+                }
+                c = rl.GetCharPressed()
+            }
+            if rl.IsKeyPressed(.BACKSPACE) && int_box.len > 0 {
+                int_box.len -= 1
+                int_box.buf[int_box.len] = 0
+            }
+            if rl.IsKeyPressed(.ENTER) || rl.IsKeyPressed(.KP_ENTER) {
+                text := string(int_box.buf[:int_box.len])
+                val, ok := strconv.parse_i64(text, 10)
+                if ok {
+                    bits = transmute(u32)i32(val)
+                }
+                int_box.active = false
+            }
+        }
+
+        // Handle text input for the float box
+        if float_box.active {
+            c := rl.GetCharPressed()
+            for c != 0 {
+                if (c >= '0' && c <= '9') || c == '-' || c == '.' || c == 'e' || c == 'E' || c == '+' {
+                    if float_box.len < len(float_box.buf) - 1 {
+                        float_box.buf[float_box.len] = u8(c)
+                        float_box.len += 1
+                    }
+                }
+                c = rl.GetCharPressed()
+            }
+            if rl.IsKeyPressed(.BACKSPACE) && float_box.len > 0 {
+                float_box.len -= 1
+                float_box.buf[float_box.len] = 0
+            }
+            if rl.IsKeyPressed(.ENTER) || rl.IsKeyPressed(.KP_ENTER) {
+                text := string(float_box.buf[:float_box.len])
+                val, ok := strconv.parse_f64(text)
+                if ok {
+                    bits = transmute(u32)f32(val)
+                }
+                float_box.active = false
             }
         }
 
         float_value := transmute(f32)bits
-        int_value := cast(i32)bits
+        int_value := transmute(i32)bits
 
+        // Sync text buffers with bits whenever bits change externally
+        if bits != prev_bits {
+            if !int_box.active {
+                int_box.buf = {}
+                int_box.len = len(fmt.bprintf(int_box.buf[:], "%d", int_value))
+            }
+            if !float_box.active {
+                float_box.buf = {}
+                float_box.len = len(fmt.bprintf(float_box.buf[:], "%g", float_value))
+            }
+            prev_bits = bits
+        }
+
+        ////////////////////////////////////////////////////////////////////////
+        // Draw Logic
+        ////////////////////////////////////////////////////////////////////////
         rl.BeginDrawing()
         rl.ClearBackground(rl.RAYWHITE)
 
         rl.DrawText("INT32", 40, top_y - 30, 20, rl.DARKGRAY)
         rl.DrawText("FLOAT32", 40, bottom_y - 30, 20, rl.DARKGRAY)
 
-        rl.DrawText(rl.TextFormat("int: %d", int_value), 900, top_y, 20, rl.BLACK)
-        rl.DrawText(rl.TextFormat("float: %f", float_value), 900, bottom_y, 20, rl.BLACK)
+        // Integer input box
+        rl.DrawText("i32:", 80, 315, 20, rl.DARKGRAY)
+        int_border := rl.DARKGRAY
+        if int_box.active {int_border = rl.BLUE}
+        rl.DrawRectangleRec(int_box.rect, rl.WHITE)
+        rl.DrawRectangleLinesEx(int_box.rect, 2, int_border)
+        rl.DrawText(
+            cstring(raw_data(int_box.buf[:])),
+            i32(int_box.rect.x) + 5,
+            i32(int_box.rect.y) + 5,
+            18,
+            rl.BLACK,
+        )
+
+        // Float input box
+        rl.DrawText("f32:", 420, 315, 20, rl.DARKGRAY)
+        float_border := rl.DARKGRAY
+        if float_box.active {float_border = rl.BLUE}
+        rl.DrawRectangleRec(float_box.rect, rl.WHITE)
+        rl.DrawRectangleLinesEx(float_box.rect, 2, float_border)
+        rl.DrawText(
+            cstring(raw_data(float_box.buf[:])),
+            i32(float_box.rect.x) + 5,
+            i32(float_box.rect.y) + 5,
+            18,
+            rl.BLACK,
+        )
 
         for r in bit_rects {
             bit := (bits >> r.index) & 1
