@@ -69,7 +69,7 @@ For Windows, we will install the native `msvc` C/C++ compiler.
 * Under the "Workloads" tab, select "Desktop development with C++".
   ![alt text](docs/images/vs-install.png)
 * Click `Install`.
-* In the Windows start menu or search bar, search for `Developer PowerShell for VS 2026` and run it.
+* In the Windows start menu or search bar, search for `Developer PowerShell for VS` and run it.
 * In PowerShell, change the directory to where you downloaded Nando Lang.
   ```
   cd <path-to-nando-lang>
