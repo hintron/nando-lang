@@ -60,14 +60,17 @@ sudo apt install build-essentials
 
 For Windows, we will install the native `msvc` C/C++ compiler.
 
-* Go to the [Visual Studios downloads page](https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2022)
-* Download ["Build Tools for Visual Studio 2022"](https://aka.ms/vs/17/release/vs_BuildTools.exe)
-* Run `vs_BuildTools.exe`
-* Under the "Workloads" tab, select "Desktop development with C++"
+* Go to the [Visual Studios downloads page](https://visualstudio.microsoft.com/downloads/) and scroll down to the bottom to the "All Downloads" section.
+  ![alt text](docs/images/build-tools.png)
+* Download ["Build Tools for Visual Studio 2026"](https://aka.ms/vs/stable/vs_BuildTools.exe).
+* Run `vs_BuildTools.exe`.
+* Click "Select workloads and components manually".
+  ![alt text](docs/images/select-components-manually.png)
+* Under the "Workloads" tab, select "Desktop development with C++".
   ![alt text](docs/images/vs-install.png)
-* Click `Install`
-* Search for `Developer PowerShell for VS 2022` and run it
-* In PowerShell, change the directory to where you downloaded Nando Lang
+* Click `Install`.
+* In the Windows start menu or search bar, search for `Developer PowerShell for VS 2026` and run it.
+* In PowerShell, change the directory to where you downloaded Nando Lang.
   ```
   cd <path-to-nando-lang>
   ```
@@ -92,7 +95,7 @@ First, determine the terminal program to use.
 * macOS: `terminal`
 * Linux: `konsole`
   * (If using WSL, you will already be using a terminal program.)
-* Windows: Developer PowerShell for VS 2022
+* Windows: Developer PowerShell for VS 2026
   * (You must use a "Developer" version of PowerShell, or else `msvc` will
     not be available.)
 
@@ -199,13 +202,6 @@ Pointers
 
 * [Watch this 3-minute pointers explanation](https://www.boot.dev/lessons/f6b606aa-cca7-4043-9689-6d72117a69ca)
 
-
 En espanol:
 
 * [Punteros en C](https://www.youtube.com/watch?v=y3K3jb3wv2I)
-* []()
-* []()
-* []()
-* []()
-
-
